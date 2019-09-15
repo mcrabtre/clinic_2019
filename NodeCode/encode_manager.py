@@ -58,11 +58,53 @@ def get_work_file(): #returns current training data for the node. (dependant on 
     return pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=0, nrows=file_size).values
 
 
+def stage1_send(): #returns a tuple containing nodes to receive from, and the encoded data to send
+    global data_size
+    global node
+    global itr
+    recv_nodes = (cycle5(node+1),cycle5(node+2))
+    part_mutation = [4,1,2,3,4]
+    file_mutation = [3,4,1,2,3]
+    for i in range(1,itr):
+        part_mutation.insert(4, part_mutation.pop(0))
+        file_mutation[cycle5(5-(i-1))-1] = cycle4(file_mutation[cycle5(5-(i-1))-1]-1)
+    part_size = int(data_size/20)
+    p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
+    p2 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=4*part_size + (part_mutation[node-1]-1)*part_size, nrows=part_size).values
+    data_send = encode(p1,p2)
+    return recv_nodes, data_send
+
+
+def stage2_send():
+    global data_size
+    global node
+    global itr
+    file_mutation = [2,3,4,1,2]
+    for i in range(1,itr):
+        file_mutation[cycle5(5-(i-1))-1] = cycle4(file_mutation[cycle5(5-(i-1))-1]-1)
+    part_size = int(data_size / 20)
+    p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
+    return p1
+
+
 def cycle5(value): # for ease of iterative counting
-    if value <= 5:
-        return value
+    if value > 0:
+        if value <= 5:
+            return value
+        else:
+            return cycle5(value-5)
     else:
-        return cycle5(value-5)
+        return cycle5(value+5)
+
+
+def cycle4(value): # for ease of iterative counting
+    if value > 0:
+        if value <= 4:
+            return value
+        else:
+            return cycle5(value-4)
+    else:
+        return cycle5(value+4)
 
 
 def encode(part1, part2): #bitwise XOR encode
@@ -79,6 +121,7 @@ def decode(key, part): #partitions are decoded in the same way they are encoded
 
 
 # misc testing code
+'''
 create_workspace(4, 'test.csv', 40)
 print(cycle5(27))
 p1 = pd.read_csv('test.csv', dtype='uint8', skiprows=15, nrows=2).values
@@ -107,3 +150,4 @@ print('wf is ',wf)
 
 print('dec1 = p1 is ', (dec1 == p1))
 print('dec2 = p2 is ', (dec2 == p2))
+'''
