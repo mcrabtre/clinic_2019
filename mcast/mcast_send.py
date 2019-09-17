@@ -17,10 +17,11 @@ use = True
 # cannot send more than 65k bytes at a time (at least to pis)
 def send(data):
     print("sending")
-    MCAST_GRP = '225.1.1.1'
+    MCAST_GRP = '224.3.29.71'
     MCAST_PORT = 5007
     
     data = data # data has properties .w .nodenum .tau .k
+    #= b'0xff' + y
     datasend = pickle.dumps(data) 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
@@ -40,7 +41,7 @@ if use == True:
     #data_pts = pd.read_csv(filepath, skiprows=0, nrows=(d*N)).values
     #w,fn = NodeSvm.NodeSVM(w,N)
     data = types.SimpleNamespace(w=w)#,data_pts=data_pts) 
-    print("message is %s"%data.w)
+    print("message is %s", data.w)
     send(data)
     #send(d)
 

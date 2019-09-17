@@ -67,7 +67,7 @@ def stage1_send(): #returns a tuple containing nodes to receive from, and the en
     file_mutation = [3,4,1,2,3]
     for i in range(1,itr):
         part_mutation.insert(4, part_mutation.pop(0))
-        file_mutation[cycle5(5-(i-1))-1] = cycle4(file_mutation[cycle5(5-(i-1))-1]-1)
+        file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1)
     part_size = int(data_size/20)
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
     p2 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=4*part_size + (part_mutation[node-1]-1)*part_size, nrows=part_size).values
@@ -75,16 +75,29 @@ def stage1_send(): #returns a tuple containing nodes to receive from, and the en
     return recv_nodes, data_send
 
 
-def stage2_send(): #returns data to send for stage 2
+def stage2_send(): #returns data to send for stage 2, and an integer for recieve node for stage 2
     global data_size
     global node
     global itr
     file_mutation = [2,3,4,1,2]
     for i in range(1,itr):
-        file_mutation[cycle5(5-(i-1))-1] = cycle4(file_mutation[cycle5(5-(i-1))-1]-1)
+        file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1)
     part_size = int(data_size / 20)
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
-    return p1
+    return p1, cycle5(node + 1)
+
+
+def recv(stage1_m,stage1_M,stage2):
+    global data_size
+    global node
+    global itr
+    part_size = int(data_size / 20)
+    decodem_mut = [1,2,3,4,1] #shift left
+    decodeM_mut = [2,3,4,1,2] #end - i
+    wret_part_mut = [1,2,3,4,1] #sl
+    wret_file_mut = [1,2,3,4,1] #e-i must be offset by 1 iteration
+
+
 
 
 def cycle5(value): # for ease of iterative counting
@@ -119,7 +132,7 @@ def decode(key, part): #partitions are decoded in the same way they are encoded
     new = encode(key, part)
     return new
 
-
+'''
 # misc testing code
 create_workspace(4, 'test.csv', 40)
 print(cycle5(27))
@@ -149,3 +162,4 @@ print('wf is ',wf)
 
 print('dec1 = p1 is ', (dec1 == p1))
 print('dec2 = p2 is ', (dec2 == p2))
+'''

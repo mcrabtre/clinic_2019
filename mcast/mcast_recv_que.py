@@ -11,7 +11,7 @@ def m_recv():
     MCAST_GRP = '224.3.29.71' #UDP IP
     #MCAST_PORT = 5007 # UDP port
     #MCAST_GRP = '192.168.0.102'
-    server_addr = ('',10000)
+    server_addr = ('',5007)
     #print(server_addr)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)#, socket.IPPROTO_UDP)
@@ -35,7 +35,7 @@ def m_recv():
         #recvd = sock.recvfrom(40000)
         if recvd:
             on = False
-
+#y.rpartition(b'ff')[2]
     rec = pickle.loads(recvd) 
     sock.close()  
     return rec
