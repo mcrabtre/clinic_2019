@@ -38,6 +38,8 @@ def create_workspace(nodeNum,filePath,totalDataSize): #creates a headerless work
     data_size = totalDataSize
     global node
     node = nodeNum
+    global itr
+    itr = 1
     otherNodes = [1,2,3,4,5]
     otherNodes.remove(nodeNum)
     fileSize = int(totalDataSize/5)
@@ -67,7 +69,7 @@ def stage1_send(): #returns a tuple containing nodes to receive from, and the en
     file_mutation = [3,4,1,2,3]
     for i in range(1,itr):
         part_mutation.insert(4, part_mutation.pop(0))
-        file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1)
+        file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1) #i call this an end - i mutation
     part_size = int(data_size/20)
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
     p2 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=4*part_size + (part_mutation[node-1]-1)*part_size, nrows=part_size).values
@@ -87,17 +89,40 @@ def stage2_send(): #returns data to send for stage 2, and an integer for recieve
     return p1, cycle5(node + 1)
 
 
-def recv(stage1_m,stage1_M,stage2):
+def recv(stage1_m, stage1_M, stage2):
     global data_size
     global node
     global itr
     part_size = int(data_size / 20)
-    decodem_mut = [1,2,3,4,1] #shift left
-    decodeM_mut = [2,3,4,1,2] #end - i
+    decodem_mut = [1,2,3,4,1] #end - i
+    decodeM_mut = [2,3,4,1,2] #shift left
     wret_part_mut = [1,2,3,4,1] #sl
-    wret_file_mut = [1,2,3,4,1] #e-i must be offset by 1 iteration
-
-
+    wret_file_mut = [1,2,3,4,4] #e-i must be offset by 1 iteration
+    ret_file_mut = [4,1,2,3,4] #e-i
+    ret_part_mut = [1,2,3,4,4] #sl
+    for i in range(1, itr): # this loop mutates each index for current iteration
+        decodem_mut[5 - cycle5(i)] = cycle4(decodem_mut[5 - cycle5(i)] - 1)
+        wret_file_mut[5 - cycle5(i+1)] = cycle4(wret_file_mut[5 - cycle5(i+1)] - 1)
+        ret_file_mut[5 - cycle5(i)] = cycle4(ret_file_mut[5 - cycle5(i)] - 1)
+        decodeM_mut.insert(4, decodeM_mut.pop(0))
+        wret_part_mut.insert(4, wret_part_mut.pop(0))
+        ret_part_mut.insert(4, ret_part_mut.pop(0))
+    # the below file accesses are for each part of the new stored data, may consider doing just one access for speed
+    decM = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(decodeM_mut[node-1]-1)*part_size, nrows=part_size).values
+    decm = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(decodem_mut[node-1]-1)*part_size, nrows=part_size).values
+    R = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(wret_file_mut[node-1]-1)*part_size, nrows=part_size).values
+    pre_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(4*part_size), nrows=part_size*(ret_part_mut[node-1]-1)).values
+    ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(ret_file_mut[node-1]-1)*part_size, nrows=part_size).values
+    post_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows= part_size*(4+ret_part_mut[node-1]), nrows=part_size*(4 - ret_part_mut[node-1])).values
+    S1M = decode(decM, stage1_M)
+    S1m = decode(decm, stage1_m)
+    wf = np.array([R, S1M, stage2, S1m])
+    for i in range(1, 6 - wret_file_mut[node-1]): #reorders work file for current mutation
+        wf = np.append(wf, [wf[0]], 0)
+        wf = np.delete(wf, 0, 0)
+    wf = np.concatenate((wf, pre_ret, ret, post_ret), axis=0, out=None)
+    np.savetxt("work.csv", wf, '%i', delimiter=",")  #saves new wf into work.csv
+    itr = itr + 1
 
 
 def cycle5(value): # for ease of iterative counting
