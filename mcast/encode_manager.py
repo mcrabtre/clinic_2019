@@ -50,14 +50,19 @@ def create_workspace(nodeNum,filePath,totalDataSize): #creates a headerless work
         else:
             p = pd.read_csv(filePath, dtype='uint8', skiprows=int(((x-1)*fileSize)+((nodeNum-1)/4)*fileSize), nrows=fileSize/4).values
         f = np.concatenate((f, p), axis=0, out=None)
-
     np.savetxt("work.csv", f, '%i', delimiter=",") #creates, and saves f into work.csv (in same directory as encode_manager.py)
+    return f
 
 
 def get_work_file(): #returns current training data for the node. (dependant on shuffle iteration)
     global data_size
     file_size = data_size/5
     return pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=0, nrows=file_size).values
+
+
+def get_itr(): #returns current iteration
+    global itr
+    return itr
 
 
 def stage1_send(): #returns a tuple containing nodes to receive from, and the encoded data to send
@@ -86,7 +91,7 @@ def stage2_send(): #returns data to send for stage 2, and an integer for recieve
         file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1)
     part_size = int(data_size / 20)
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
-    return p1, cycle5(node + 1)
+    return p1, cycle5(node + 1) #change order
 
 
 def recv(stage1_m, stage1_M, stage2):
@@ -114,15 +119,17 @@ def recv(stage1_m, stage1_M, stage2):
     pre_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(4*part_size), nrows=part_size*(ret_part_mut[node-1]-1)).values
     ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(ret_file_mut[node-1]-1)*part_size, nrows=part_size).values
     post_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows= part_size*(4+ret_part_mut[node-1]), nrows=part_size*(4 - ret_part_mut[node-1])).values
-    S1M = decode(decM, stage1_M)
-    S1m = decode(decm, stage1_m)
-    wf = np.array([R, S1M, stage2, S1m])
-    for i in range(1, 6 - wret_file_mut[node-1]): #reorders work file for current mutation
+    S1M = decode(decM, stage1_M) #decodes data recieved from the Major (furthest away) node
+    S1m = decode(decm, stage1_m) #decodes data recieved from the minor (closest) node
+    wf = np.concatenate((R, S1M, stage2, S1m), axis=0, out=None)
+    #print('wf shape ', wf.shape)
+    for i in range(1, 6 - wret_file_mut[node-1]): # this loop reorders the work file for current mutation
         wf = np.append(wf, [wf[0]], 0)
         wf = np.delete(wf, 0, 0)
     wf = np.concatenate((wf, pre_ret, ret, post_ret), axis=0, out=None)
     np.savetxt("work.csv", wf, '%i', delimiter=",")  #saves new wf into work.csv
     itr = itr + 1
+    return wf
 
 
 def cycle5(value): # for ease of iterative counting
@@ -157,6 +164,8 @@ def decode(key, part): #partitions are decoded in the same way they are encoded
     new = encode(key, part)
     return new
 
+
+#create_workspace(1,'test.csv',20)
 '''
 # misc testing code
 create_workspace(4, 'test.csv', 40)
