@@ -9,8 +9,8 @@ use = True
 def m_recv():
 #def m_recv(que):
     print('M_recv called')
-    MCAST_GRP = '225.1.1.1' #UDP IP
-    #MCAST_GRP = '224.3.29.71'
+    #MCAST_GRP = '225.1.1.1' #UDP IP
+    MCAST_GRP = '224.3.29.71'
     MCAST_PORT = 5007 # UDP port
     #MCAST_GRP = '192.168.0.102'
     #server_addr = ('192.168.0.101',10000)
