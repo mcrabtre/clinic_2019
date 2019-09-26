@@ -17,19 +17,20 @@ import node_server
 	Main for the nodes. Starts and waits for data from agg. once received it unpacks data and runs the svm.
 	It then sends the w vector and loss functions back to the agg.
 '''
+node = 1
 
 def run():
     while True:
 
         # node detection: determine IP address
         #nodeIP = socket.gethostbyname_ex("raspberrypi.local")#[-1]
-        #os.system('hostname -I > output.txt') #these 6 commands reads ip address from linux OS
-        #ipFile = open('output.txt', 'r')
-        #nIP = ipFile.readline()
-        #nodeIP = nIP.rstrip(' \n')
-        #ipFile.close()
-        #os.remove('output.txt')
-        nodeIP = '192.168.0.106' '''Currently unable to detect own ip do to identical names. Must be changed for each node'''
+        os.system('hostname -I > output.txt') #these 6 commands reads ip address from linux OS
+        ipFile = open('output.txt', 'r')
+        nIP = ipFile.readline()
+        nodeIP = nIP.rstrip(' \n')
+        ipFile.close()
+        os.remove('output.txt')
+        #nodeIP = '192.168.0.106' '''Currently unable to detect own ip do to identical names. Must be changed for each node'''
 
         print(nodeIP)
         # listen for info from aggregator.

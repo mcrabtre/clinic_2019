@@ -91,7 +91,7 @@ def stage2_send(): #returns data to send for stage 2, and an integer for recieve
         file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1)
     part_size = int(data_size / 20)
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
-    return p1, cycle5(node + 1) #change order
+    return cycle5(node + 1), p1 #change order
 
 
 def recv(stage1_m, stage1_M, stage2):
