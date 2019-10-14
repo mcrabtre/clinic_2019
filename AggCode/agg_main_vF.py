@@ -39,7 +39,12 @@ def run(K,tau=0,shuff=0,avc=0):
     
     # node detection
     router_ip = '192.168.0.1'
-    host,iplist = nodeDetection.run(router_ip)
+    not5 = True
+    while not5:
+        host,iplist = nodeDetection.run(router_ip) #finds other nodes connected to router and gives its TCP ip address
+        #may ditch this to implement full multicast including agg
+        print('waiting for 5 nodes')
+        not5 = (iplist.__len__() != 5)
     node_dict = {} 
 	# determine number of nodes
     n = 0
@@ -48,9 +53,9 @@ def run(K,tau=0,shuff=0,avc=0):
         n += 1
     N = n
 	# initialize data size d, iterations tau, and matrices for w, averages, and loss functions.
-    if tau ==0:
-        tau =N
-    multiplier = 3
+    if tau == 0:
+        tau = N
+    multiplier = 4
     d = multiplier * n # number data points per node This value can be changed as desired.
     w = np.zeros(784)
 
@@ -58,10 +63,10 @@ def run(K,tau=0,shuff=0,avc=0):
     accs = np.zeros(K)
 	
 	## Start global updates
-    for k in range (0,K): # aggregator as client, k global iterations 
+    for k in range (0,K): # aggregator as client, k global iterations
         # send global update information to nodes
         ### Currently using the same dataset throughout. change k=k to refresh data
-        data = types.SimpleNamespace(w=w,k=0,host=host,node_dict=node_dict,d=d,tau=tau,shuff=shuff)#data_pts=data_pts) #data on nodes
+        data = types.SimpleNamespace(w=w, k=0, host=host, node_dict=node_dict, d=d, tau=tau, shuff=shuff)#data_pts=data_pts) #data on nodes
 		
         # Send Data
         #mcast_send.send(data) # alternative to sending to nodes one at a time.

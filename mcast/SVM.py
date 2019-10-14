@@ -18,7 +18,7 @@ import Shuffle
 def svm(w,data_pts,eta,lam,tau,d,weight,shuff=0,N=1,n=0):#,result,index): #,tau):
     l = len(w)
     fn = np.zeros(tau) # array of calculated loss functions for each local iteration (tau)
-
+    #tau hardcoded as zero to implement coded shuffling
     for t in range(0, int(tau)):
         if t>0: # execute shuffling after the first iteration
             if shuff==1:
@@ -27,7 +27,7 @@ def svm(w,data_pts,eta,lam,tau,d,weight,shuff=0,N=1,n=0):#,result,index): #,tau)
                 data_pts = Shuffle.rRobin(data_pts,N=N)
             elif shuff==3:
                 data_pts = Shuffle.segShift(data_pts,N=N)
-        x, y = Read.Read(d, data_pts, weight, offset=n) # weight modifies yread
+        x, y = Read.Read(d, data_pts, weight, offset=0) # weight modifies yread
         wT = w.transpose()
         dfn = np.zeros(l)
         for j in range(0 , d):           
