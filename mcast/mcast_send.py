@@ -15,22 +15,35 @@ import numpy as np
 use = False 
 use = True
 # cannot send more than 65k bytes at a time (at least to pis)
-def send(data):
+def send(node, stage, data):
     print("sending")
-    MCAST_GRP = '224.3.29.71'
-    MCAST_PORT = 5007
+    ip_switcher = {
+        1: '224.3.29.71',
+        2: '224.3.29.72',
+        3: '224.3.29.73',
+        4: '224.3.29.74',
+        5: '224.3.29.75',
+    }
+    MCAST_GRP = ip_switcher.get(node, '0.0.0.0')
+    port_switcher = {
+        1: 5007,
+        2: 5008,
+    }
+    MCAST_PORT = port_switcher.get(stage, 0000)
     
     data = data # data has properties .w .nodenum .tau .k
     #= b'0xff' + y
-    datasend = pickle.dumps(data) 
+    #need to tune send buffers
+    datasend = pickle.dumps(data) #will ditch pickle later, its garbage
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
     
     sock.sendto(datasend, (MCAST_GRP, MCAST_PORT))
     print("sent")
+    sock.close()
 
 
-if use == True:
+if use:
     #use:
     K = 1
     N = 1

@@ -3,7 +3,7 @@ import struct
 import pickle
 
 
-def m_recv(node,stage):
+def m_recv(node, stage, q):
 
     ip_switcher = {
         1: '224.3.29.71',
@@ -41,7 +41,7 @@ def m_recv(node,stage):
     print()
     print(rec.w)
     return rec
-
+    sock.close()
 
 rec = m_recv()
 #print('at the bottom of the ocean')

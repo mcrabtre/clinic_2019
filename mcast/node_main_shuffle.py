@@ -64,7 +64,7 @@ def run():
         data_pts = e.get_work_file()
 
         # SVM
-        w,fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n)
+        w,fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n-1)
             
         # send w to agg
         node_client.client(w,fn,host)

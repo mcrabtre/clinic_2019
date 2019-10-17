@@ -3,7 +3,7 @@ Created 15AUG2019 by mcrabtre
 """
 import pandas as pd
 import numpy as np
-import os
+
 '''
     **data partitions**
     This module manages data partitions and subpartitions for encoded shuffling including 5 nodes.
@@ -20,7 +20,13 @@ import os
     
     **shuffling stages**
     shuffling takes place in two stages, the encode send stage, and the cleanup stage. The encode send stage 
-    encodes two partitions and sends it, eventually this will be received by two other nodes.  
+    encodes two partitions and sends it, eventually this will be received by two other nodes. Stage 2 is a 
+    single non-coded partition. These two stages were necessary for the entire data set to be shuffled among the nodes
+    each iteration. 
+    
+    **receiving**
+    this manager completely automates the receiving process, it takes in 3 different partitions. Stage1_m is the 
+    partition received from the minor node, or the node wih the next successive node number.
 '''
 data_size = 20
 node = 0
@@ -51,7 +57,7 @@ def create_workspace(nodeNum,filePath,totalDataSize): #creates a headerless work
             p = pd.read_csv(filePath, dtype='uint8', skiprows=int(((x-1)*fileSize)+((nodeNum-1)/4)*fileSize), nrows=fileSize/4).values
         f = np.concatenate((f, p), axis=0, out=None)
     np.savetxt("work.csv", f, '%i', delimiter=",") #creates, and saves f into work.csv (in same directory as encode_manager.py)
-    return f
+    #return f
 
 
 def get_work_file(): #returns current training data for the node. (dependant on shuffle iteration)
@@ -65,11 +71,10 @@ def get_itr(): #returns current iteration
     return itr
 
 
-def stage1_send(): #returns a tuple containing nodes to receive from, and the encoded data to send
+def stage1_send(): #returns encoded data to send stage1
     global data_size
     global node
     global itr
-    recv_nodes = (cycle5(node+1),cycle5(node+2))
     part_mutation = [4,1,2,3,4]
     file_mutation = [3,4,1,2,3]
     for i in range(1,itr):
@@ -79,10 +84,10 @@ def stage1_send(): #returns a tuple containing nodes to receive from, and the en
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
     p2 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=4*part_size + (part_mutation[node-1]-1)*part_size, nrows=part_size).values
     data_send = encode(p1,p2)
-    return recv_nodes, data_send
+    return data_send
 
 
-def stage2_send(): #returns data to send for stage 2, and an integer for recieve node for stage 2
+def stage2_send(): #returns data to send for stage 2
     global data_size
     global node
     global itr
@@ -91,7 +96,7 @@ def stage2_send(): #returns data to send for stage 2, and an integer for recieve
         file_mutation[5-cycle5(i)] = cycle4(file_mutation[5-cycle5(i)]-1)
     part_size = int(data_size / 20)
     p1 = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(file_mutation[node-1]-1)*part_size, nrows=part_size).values
-    return cycle5(node + 1), p1 #change order
+    return p1
 
 
 def recv(stage1_m, stage1_M, stage2):
@@ -129,7 +134,13 @@ def recv(stage1_m, stage1_M, stage2):
     wf = np.concatenate((wf, pre_ret, ret, post_ret), axis=0, out=None)
     np.savetxt("work.csv", wf, '%i', delimiter=",")  # saves new wf into work.csv
     itr = itr + 1
-    return wf
+    #return wf
+
+
+def node_tracker():
+    global node
+    recv_nodes = (cycle5(node+1), cycle5(node+2), cycle5(node+1)) #(s1minor, s1Major, s2)
+    return recv_nodes
 
 
 def cycle5(value): # for ease of iterative counting
