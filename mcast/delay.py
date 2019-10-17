@@ -1,10 +1,14 @@
 import time
 
+kill = False
 
-def delay(seconds, data_que, job_que):
-    a = job_que.get()
-    time.sleep(seconds)
-    data_que.put(a)
-    job_que.task_done()
-    job_que.put(a)
-    return
+
+def delay(seconds, data_que, data, priority):
+    while not kill:
+        time.sleep(seconds)
+        data_que.put((priority, data))
+
+
+def get_kill():
+    return kill
+

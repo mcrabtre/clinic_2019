@@ -12,8 +12,7 @@ import pickle
 import numpy as np
 #import pandas as pd
 
-use = False 
-use = True
+
 # cannot send more than 65k bytes at a time (at least to pis)
 def send(node, stage, data):
     print("sending")
@@ -43,20 +42,6 @@ def send(node, stage, data):
     sock.close()
 
 
-if use:
-    #use:
-    K = 1
-    N = 1
-    d = 10   
-    w = "array of values"
-    #w = np.ones(784)
-    #filepath = r"train.csv"
-    #data_pts = pd.read_csv(filepath, skiprows=0, nrows=(d*N)).values
-    #w,fn = NodeSvm.NodeSVM(w,N)
-    data = types.SimpleNamespace(w=w)#,data_pts=data_pts) 
-    print("message is %s", data.w)
-    send(data)
-    #send(d)
 
 #source: https://stackoverflow.com/questions/603852/how-do-you-udp-multicast-in-python
 
