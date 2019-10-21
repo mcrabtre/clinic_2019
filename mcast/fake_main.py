@@ -6,24 +6,43 @@ import time
 
 
 def run(itr=5):
-    data_q = queue.PriorityQueue(3)
-    icount = 1
-    data = ['first', 'second', 'third']
+    cache_q = queue.Queue() #use of the queue structure ensures safe exchange of data between threads
+    icount = 1 #compare to iterations
+    data = ['first', 'second', 'third'] #just needed for delay fn
     threads = {}
+    cpart = 1 #this variable keeps track of which data part is needed next for recieve, there are 3 needed for each recv
+    time_init = time.time()
+    ans_data = [(0, 'data'), (0, 'data'), (0, 'data')]
     for i in range(3):
-        sec = random.randint(1, 3)
-        threads[i] = threading.Thread(target=delay.delay, args=(sec, data_q, data[i], i + 1), daemon=False)
+        sec = random.randint(1, 3) #for delay fn
+        #create and start seperate threads to recieve from different nodes
+        threads[i] = threading.Thread(target=delay.delay, args=(sec, cache_q, data[i], i + 1), daemon=False)
         threads[i].start()
         print('starting thread ', i)
-        time_init = time.time()
-    while icount <= itr:
-        if data_q.full():
-            for i in range(data_q.qsize()):
-                print(data_q.get())
-                icount = icount + 1
-        if time.time() >= (time_init + 60):
+    while icount <= itr: #main running loop
+        if cpart >= 4: #recieve condition triggers when all data is ready
+            print(ans_data[0][1], ans_data[1][1], ans_data[2][1])
+            cpart = 1
+            time_init = time.time()
+            icount = icount + 1
+        for i in range(cache_q.qsize()): #cycle through the queue for recieve data
+            a = cache_q.get()
+            if a[0] == cpart:
+                ans_data[cpart - 1] = a
+                cpart = cpart + 1
+            else:
+                cache_q.put(a)
+
+        if time.time() >= (time_init + 60): #times out 60s of not recieving all 3 pieces of data
+            print("Error: treads timed out")
             break
-        else:
-            print('queue not full', threading.active_count(), data_q.qsize())
-    if not delay.get_kill():
+        else: #not necessary, will delete later
+            print('queue not full', threading.active_count(), cache_q.qsize())
+            time.sleep(0.5)
+    if not delay.get_kill(): #kills threads by ending underlying function(s)
         delay.kill = True
+        print('Threads killed')
+
+
+run()
+
