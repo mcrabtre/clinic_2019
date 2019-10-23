@@ -1,0 +1,21 @@
+import threading
+import queue
+import mcast_recv1
+
+
+def run():
+    threads = {}
+    recv_nodes = [1, 1, 2]
+    recv_stages = [1, 2, 1]
+    cache_q = queue.Queue()
+    for i in range(3):
+        # create and start separate threads to receive from different nodes (node, stage, q, priority):
+        threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes[i], recv_stages[i], cache_q, i + 1), daemon=False)
+        threads[i].start()
+        print('starting thread ', i+1)
+    while True:
+        for i in range(cache_q.qsize()):
+            a = cache_q.get()
+            print('Data received')
+            print(' ')
+            print(a)

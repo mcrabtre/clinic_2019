@@ -42,11 +42,11 @@ def m_recv(node, stage, q, priority):
         rec = pickle.loads(recvd)
         #print('Received Data')
         #print()
-        print(rec)
+        #print(rec)
         q.put((priority, rec))
         sock.close()
 
 
 q = queue.Queue()
-m_recv()
+m_recv(1, 1, q, 1)
 #print('at the bottom of the ocean')
