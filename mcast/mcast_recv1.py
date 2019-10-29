@@ -8,19 +8,38 @@ kill = False
 
 def m_recv(node, stage, q, priority):
     while not kill:
-        ip_switcher = {
-            1: '224.3.29.71',
-            2: '224.3.29.72',
-            3: '224.3.29.73',
-            4: '224.3.29.74',
-            5: '224.3.29.75',
-        }
+        if stage == 1:
+            ip_switcher = {
+                1: '224.3.29.71',
+                2: '224.3.29.72',
+                3: '224.3.29.73',
+                4: '224.3.29.74',
+                5: '224.3.29.75',
+            }
+            port_switcher = {
+                1: 5001,
+                2: 5002,
+                3: 5003,
+                4: 5004,
+                5: 5005,
+            }
+        else:
+            ip_switcher = {
+                1: '224.3.29.76',
+                2: '224.3.29.77',
+                3: '224.3.29.78',
+                4: '224.3.29.79',
+                5: '224.3.29.80',
+            }
+            port_switcher = {
+                1: 5006,
+                2: 5007,
+                3: 5008,
+                4: 5009,
+                5: 5010,
+            }
         MCAST_GRP = ip_switcher.get(node, '0.0.0.0')
-        port_switcher = {
-            1: 5007,
-            2: 5008,
-        }
-        MCAST_PORT = port_switcher.get(stage, 0000)
+        MCAST_PORT = port_switcher.get(node, 0000)
         server_addr = ('',MCAST_PORT)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -34,7 +53,7 @@ def m_recv(node, stage, q, priority):
         recvd = b''
         on = True
         while on:
-            print('Attempting to receive from ', MCAST_GRP)
+            print('Attempting to receive from ', MCAST_GRP, MCAST_PORT)
             recvd, addr = sock.recvfrom(buff)
             if recvd:
                 on = False
@@ -47,6 +66,6 @@ def m_recv(node, stage, q, priority):
         sock.close()
 
 
-q = queue.Queue()
-m_recv(1, 1, q, 1)
+#q = queue.Queue()
+#m_recv(1, 1, q, 1)
 #print('at the bottom of the ocean')

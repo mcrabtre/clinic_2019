@@ -3,7 +3,7 @@ import queue
 import mcast_recv1
 
 
-def run():
+def test():
     threads = {}
     recv_nodes = [1, 1, 2]
     recv_stages = [1, 2, 1]
@@ -24,4 +24,3 @@ def run():
     print('Script Finished')
     mcast_recv1.kill = True
 
-run()
