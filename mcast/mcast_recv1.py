@@ -1,12 +1,13 @@
 import socket
 import struct
 import pickle
-import queue
+import numpy
 
 kill = False
 
 
 def m_recv(node, stage, q, priority):
+    prev = 0
     while not kill:
         if stage == 1:
             ip_switcher = {
@@ -62,7 +63,9 @@ def m_recv(node, stage, q, priority):
         #print('Received Data')
         #print()
         #print(rec)
-        q.put((priority, rec))
+        if not(numpy.array_equal(rec, prev)):
+            q.put((priority, rec))
+            prev = rec
         sock.close()
 
 

@@ -6,7 +6,7 @@ Created on Wed Feb 27 13:08:14 2019
 """
 import numpy as np
 import Read
-import Shuffle
+#import Shuffle
 '''
 	SVM Gradient Descent. Takes training vectors x and lables y to perform 
         T iterations. 

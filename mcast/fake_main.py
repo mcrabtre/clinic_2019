@@ -30,6 +30,7 @@ def run(itr=5):
             if a[0] == cpart:
                 ans_data[cpart - 1] = a
                 cpart = cpart + 1
+                break
             else:
                 cache_q.put(a)
 
