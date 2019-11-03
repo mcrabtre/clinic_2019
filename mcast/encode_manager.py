@@ -55,7 +55,7 @@ def create_workspace(nodeNum,filePath,totalDataSize): #creates a headerless work
             p = pd.read_csv(filePath, dtype='uint8', skiprows=int(((x-1)*fileSize)+((nodeNum-2)/4)*fileSize), nrows=fileSize/4).values
         else:
             p = pd.read_csv(filePath, dtype='uint8', skiprows=int(((x-1)*fileSize)+((nodeNum-1)/4)*fileSize), nrows=fileSize/4).values
-        f = np.concatenate((f, p), axis=0, out=None)
+        f = np.concatenate((f, p), axis=0)
     np.savetxt("work.csv", f, '%i', delimiter=",") #creates, and saves f into work.csv (in same directory as encode_manager.py)
     #return f
 
