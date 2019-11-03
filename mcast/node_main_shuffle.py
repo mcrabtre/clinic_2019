@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 30 13:13:17 2019
-
-@author: hokis
+Created 15OCT2019 by mcrabtre
 """
-import numpy as np
-import pandas as pd
-import socket
+
 import queue
-import types
 import SVM
-import Read
 import node_client
 import node_server
 import os
@@ -20,23 +14,19 @@ import time
 import mcast_recv1
 import mcast_send
 '''
-    Main for the nodes. Starts and waits for data from agg. once received it unpacks data and runs the svm.
-    It then sends the w vector and loss functions back to the agg.
+    Main for the nodes. Starts and waits for data from agg. once received it unpacks data and runs the coded shuffle
+    svm. It then sends the w vector and loss functions back to the agg.
 '''
 
 
 def run():
     while True:
 
-        # node detection: determine IP address
-        #nodeIP = socket.gethostbyname_ex("raspberrypi.local")#[-1]
         os.system('hostname -I > output.txt') #these 6 commands reads ip address from linux OS
         ip_file = open('output.txt', 'r')
         n_ip = ip_file.readline()
         nodeIP = n_ip.rstrip(' \n')
-        ip_file.close()
         os.remove('output.txt')
-        #nodeIP = '192.168.0.106' '''Currently unable to detect own ip do to identical names. Must be changed for each node'''
 
         print('I am ', nodeIP)
         print('Waiting for Agg')
@@ -47,7 +37,7 @@ def run():
         info = node_server.server(nodeIP) 
         
         n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
-        print('I am node number ', n)
+        print('My node number is ', n)
         Num = len(info.node_dict)  # total number of nodes (should be 5)
         d = info.d  # number data points/node
         tau = info.tau  # number of local iterations
@@ -113,5 +103,6 @@ def run():
 
         # send w to agg
         node_client.client(w, fn, host)
-        
+
+
 run()

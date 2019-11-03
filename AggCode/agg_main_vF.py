@@ -40,14 +40,14 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
     router_ip = '192.168.0.1'
     not5 = True
     while not5:
-        host, iplist = nodeDetection.run(router_ip)
+        host, iplist = nodeDetection.run(router_ip)  # host is agg ip address
         # finds other nodes connected to router and gives its TCP ip address
         # may ditch this to implement full multicast including agg
         print('waiting for 5 nodes')
         not5 = (iplist.__len__() != 5)
         time.sleep(1.0)
     node_dict = {} 
-# determine number of nodes
+# assign node numbers
     n = 0
     for ind in iplist:
         node_dict[ind] = n
@@ -61,7 +61,7 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
     accs = np.zeros(K)
 
 # Start global updates
-    for k in range (0,K): # aggregator as client, k global iterations
+    for k in range (0, K): # aggregator as client, k global iterations
         # send global update information to nodes
         # Currently using the same dataset throughout. change k=k to refresh data
         # d is number of data points per node work file (each node actually stores 2*d
@@ -70,13 +70,13 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
         # Send Data
         # mcast_send.send(data) # alternative to sending to nodes one at a time.
         for i in range(0,N):  # Send to each node
-            aggr_client.client(iplist[i],data)
+            aggr_client.client(iplist[i], data)
         
         # aggregator as server; get ws from nodes 
-        result = aggr_server.aggr_server(host,N)
+        result = aggr_server.aggr_server(host, N)
         ww = result.w
-        for i in range(0,N):
-            fnfn[i,k*tau:(k+1)*tau] = result.fn[i*tau:i*tau+tau]
+        for i in range(0, N):
+            fnfn[i, k*tau:(k+1)*tau] = result.fn[i*tau:i*tau+tau]
         # Process the w
         if avc == 1:
             w = med_avg.med(ww)
@@ -95,36 +95,8 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
     print(accs)
     return w, fnfn, accs
 
-'''
-if not isImported:
-    #use
-    K = 10
-    N = 5
-    win = np.zeros(784)
-    shuff = 4
-    avc = 1 #(averaging condition)
-    stypes = ['No','Random','RoundRobin','SegShift']
-    avtypes = ['mean','median','med_avg']
-    labellist=["","","","","","","","","","","",""]
 
-    fnfn = np.zeros(shape=(shuff*avc,K*N))
-	### Runs the system using each type of shuffling(shuff) and potentially averaging (avc)
-
-   
-    for s in range(0,shuff):
-        for i in range(0,avc):
-            print(stypes[s],avtypes[i])
-            starttime = time.time()
-            w,fn,a = run(K,avc=i,shuff=s)
-            fnew = med_avg.mean(fn)
-            labellist[s+s*i] ="%s shuffling with %s model processing" %(stypes[s],avtypes[i])
-            fnfn[s+s*i,:] = fnew
-
-            print('Final time is: %.2f\n'%(time.time()-starttime))
-
-    print('done')
-'''
-
+run()
 
 
 #ssh pi@192.168.0.

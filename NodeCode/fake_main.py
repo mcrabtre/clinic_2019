@@ -1,4 +1,4 @@
-import delay
+from NodeCode import delay
 import threading
 import queue
 import random

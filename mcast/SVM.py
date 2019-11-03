@@ -15,18 +15,12 @@ import Read
         analysis
 '''
 
+
 def svm(w,data_pts,eta,lam,tau,d,weight,shuff=0,N=1,n=0):#,result,index): #,tau):
     l = len(w)
     fn = np.zeros(tau) # array of calculated loss functions for each local iteration (tau)
     #tau hardcoded as zero to implement coded shuffling
     for t in range(0, int(tau)):
-        if t>0: # execute shuffling after the first iteration
-            if shuff==1:
-                np.random.shuffle(data_pts)
-            elif shuff==2:
-                data_pts = Shuffle.rRobin(data_pts,N=N)
-            elif shuff==3:
-                data_pts = Shuffle.segShift(data_pts,N=N)
         x, y = Read.Read(d, data_pts, weight, offset=0) # weight modifies yread
         wT = w.transpose()
         dfn = np.zeros(l)
@@ -34,15 +28,11 @@ def svm(w,data_pts,eta,lam,tau,d,weight,shuff=0,N=1,n=0):#,result,index): #,tau)
             if (1-y[j]*np.dot(wT, x[j]))<0:
                 max = 0
             else:
-                max = 1-y[j]*np.dot(wT, x[j])                
-                        
+                max = 1-y[j]*np.dot(wT, x[j])
             for i in range(0,l):
                 dfn[i] += (lam*w[i]-(y[j]*x[j,i])*max)/d
-
             fn[t] += ((lam/2)*np.dot(w, wT)**2 + (max**2)/2)/d
-
         w = w - eta*dfn
-
     return w,fn
 
 
