@@ -70,6 +70,8 @@ def run():
             threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes[i], recv_stages[i], cache_q, i + 1), daemon=False)
             threads[i].start()
             print('starting thread ', i + 1)
+        # wait for other nodes to start receiving
+        time.sleep(0.1*(5-n))
 
         while icount <= shuff:  # main coded shuffling running loop (for shuff iterations)
             mcast_send.send(n, 1, e.stage1_send())  # send stage1 partition
@@ -78,25 +80,27 @@ def run():
             w, fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n - 1) #train on tau iterations data_pts d
             while cpart < 4:
                 cp = cpart  # need this to ensure queue is completely cycled before searching for the next part
+                na = True
                 for i in range(cache_q.qsize()):  # cycle through the queue for receive data
                     a = cache_q.get()  # tuple in form (part integer, DATA)
                     if a[0] == cp:  # if it is the part needed adds part to ans_data and increments to next part
                         cp = 'disabled'
                         ans_data[cpart - 1] = a
                         cpart = cpart + 1
+                        na = False
                     else:
                         cache_q.put(a)
-                if time.time() >= (time_init + 60):  # times out 60s of not receiving all 3 pieces of data
-                    print("Error: threads timed out")
+                if na:  # resends if it doesnt find data needed
+                    print("Resending")
                     break
-
+            if time.time() >= (time_init + 60):  # times out 60s of not receiving all 3 pieces of data
+                print("Error: threads timed out")
+                break
             if cpart >= 4:  # receive condition triggers when all data is ready
                 e.recv(ans_data[0][1], ans_data[1][1], ans_data[2][1])
                 cpart = 1
                 time_init = time.time()
                 icount = icount + 1
-            else:  # condition met if previous loop timed out
-                break
         if not mcast_recv1.kill:  # kills threads by ending underlying function(s)
             mcast_recv1.kill = True
             print('Threads killed')
