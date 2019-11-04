@@ -48,17 +48,20 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
         time.sleep(1.0)
     node_dict = {} 
 # assign node numbers
+    print('assigning nodes')
     n = 0
     for ind in iplist:
         node_dict[ind] = n
         n += 1
     N = n
 # initialize data size d, iterations tau, and matrices for w, averages, and loss functions.
+    print('initializing data')
     if tau == 0:
         tau = N
     w = np.zeros(784)
     fnfn = np.zeros(shape=(N+1,K*tau))
     accs = np.zeros(K)
+    print('starting global updates')
 
 # Start global updates
     for k in range (0, K): # aggregator as client, k global iterations
