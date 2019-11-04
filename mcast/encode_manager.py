@@ -123,7 +123,10 @@ def recv(stage1_m, stage1_M, stage2):
     R = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(wret_part_mut[node-1]-1)*part_size, nrows=part_size).values
     pre_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(4*part_size), nrows=part_size*(ret_part_mut[node-1]-1)).values
     ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=(ret_file_mut[node-1]-1)*part_size, nrows=part_size).values
-    post_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows= part_size*(4+ret_part_mut[node-1]), nrows=part_size*(4 - ret_part_mut[node-1])).values
+    if not ret_part_mut[node-1] == 4: #bandaid bug fix :(
+        post_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows= part_size*(4+ret_part_mut[node-1]), nrows=part_size*(4 - ret_part_mut[node-1])).values
+    else:
+        post_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=0, nrows=0).values
     S1M = decode(decM, stage1_M) # decodes data recieved from the Major (furthest away) node
     S1m = decode(decm, stage1_m) # decodes data recieved from the minor (closest) node
     wf = np.concatenate((R, S1M, stage2, S1m), axis=0, out=None)
@@ -131,7 +134,7 @@ def recv(stage1_m, stage1_M, stage2):
     for i in range(1, 6 - wret_file_mut[node-1]): # this loop reorders the work file for current mutation
         wf = np.append(wf, [wf[0]], 0)
         wf = np.delete(wf, 0, 0)
-    wf = np.concatenate((wf, pre_ret, ret, post_ret), axis=0, out=None)
+    wf = np.concatenate((wf, pre_ret, ret, post_ret), axis=0)
     np.savetxt("work.csv", wf, '%i', delimiter=",")  # saves new wf into work.csv
     itr = itr + 1
     #return wf
