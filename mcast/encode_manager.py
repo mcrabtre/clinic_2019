@@ -129,7 +129,7 @@ def recv(stage1_m, stage1_M, stage2):
         post_ret = pd.read_csv('work.csv', header=None, dtype='uint8', skiprows=0, nrows=0).values
     S1M = decode(decM, stage1_M) # decodes data recieved from the Major (furthest away) node
     S1m = decode(decm, stage1_m) # decodes data recieved from the minor (closest) node
-    wf = np.concatenate((R, S1M, stage2, S1m), axis=0, out=None)
+    wf = np.concatenate((R, S1M, stage2, S1m), axis=0)
     # print('wf shape ', wf.shape)
     for i in range(1, 6 - wret_file_mut[node-1]): # this loop reorders the work file for current mutation
         wf = np.append(wf, [wf[0]], 0)
