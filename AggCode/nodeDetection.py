@@ -21,8 +21,9 @@ def run(routerIP):
 
 	#identify aggregator IP address
 	aggIPList = socket.gethostbyname_ex(socket.gethostname())[2]
-	aggIP = aggIPList[-1]
+	#aggIP = aggIPList[-1]
 	#removing aggregator IP address
+	aggIP = '192.168.0.105'
 
 	hosts_list.remove(aggIP)
 	return aggIP, hosts_list
