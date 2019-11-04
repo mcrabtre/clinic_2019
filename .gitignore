@@ -5,3 +5,6 @@ NodeCode/train.csv
 AggCode/train.csv
 AggCode/__pycache__
 NodeCode/__pycache__
+misc.xml
+modules.xml
+vcs.xml
