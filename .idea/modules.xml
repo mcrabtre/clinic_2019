@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/clinic_2019.iml" filepath="$PROJECT_DIR$/.idea/clinic_2019.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/edgecomputing.iml" filepath="$PROJECT_DIR$/.idea/edgecomputing.iml" />
     </modules>
   </component>
 </project>

@@ -28,6 +28,18 @@ def run():
         nodeIP = n_ip.rstrip(' \n')
         os.remove('output.txt')
 
+        n = int(nodeIP[-1])+1
+        e.node = n
+        recv_nodes = e.node_tracker()
+        recv_stages = (1, 1, 2)
+        threads = {}
+        cache_q = queue.Queue()  # use of the fifo queue structure ensures safe exchange of data between threads
+
+        for i in range(3):
+            # create and start separate threads to receive from different nodes (node, stage, q, priority):
+            threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes[i], recv_stages[i], cache_q, i + 1), daemon=False)
+            threads[i].start()
+            print('starting thread ', i + 1)
         print('I am ', nodeIP)
         print('Waiting for Agg')
         # listen for info from aggregator.
@@ -36,7 +48,7 @@ def run():
         # win,tau,k,d,N,aggIP = node_server.server(node_ip)
         info = node_server.server(nodeIP) 
         
-        n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
+        #n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
         print('My node number is ', n)
         Num = len(info.node_dict)  # total number of nodes (should be 5)
         d = info.d  # number data points/node
@@ -55,27 +67,18 @@ def run():
         D = d*Num# Total data points 
         filepath = r"train.csv"
         e.create_workspace(n, filepath, D)  # initialization of the workspace file
-        cache_q = queue.Queue()  # use of the fifo queue structure ensures safe exchange of data between threads
         icount = 1  # compare to iterations
-        threads = {}
         # this variable keeps track of which data part is needed next for receive, there are 3 needed for each recv
         cpart = 1
         time_init = time.time()
         ans_data = [(0, 'no data'), (0, 'no data'), (0, 'no data')]
-        recv_nodes = e.node_tracker()
-        recv_stages = (1, 1, 2)
-
-        for i in range(3):
-            # create and start separate threads to receive from different nodes (node, stage, q, priority):
-            threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes[i], recv_stages[i], cache_q, i + 1), daemon=False)
-            threads[i].start()
-            print('starting thread ', i + 1)
         # wait for other nodes to start receiving
         time.sleep(0.1*(5-n))
 
         while icount <= shuff:  # main coded shuffling running loop (for shuff iterations)
-            mcast_send.send(n, 1, e.stage1_send())  # send stage1 partition
-            mcast_send.send(n, 2, e.stage2_send())  # send stage2 partition
+            for i in range(0, 3): #send 3 times to ensure it is sent
+                mcast_send.send(n, 1, e.stage1_send())  # send stage1 partition
+                mcast_send.send(n, 2, e.stage2_send())  # send stage2 partition
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             w, fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n - 1) #train on tau iterations data_pts d
             while cpart < 4:
