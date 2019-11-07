@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 '''
 	run a simple accuracy test of the w. opens the last 2000 points of the set and tests processes them
-	returns the accuracy of the test.
+	returns the accuracy percentage of the test.
 '''
 
 def AccTest(ww,testpoints=2000):

@@ -31,7 +31,7 @@ import numpy as np
 data_size = 20
 node = 0
 itr = 1
-
+set_flag = False
 
 def create_workspace(nodeNum,filePath,totalDataSize): #creates a headerless workspace file containing working file and partitions
     if(totalDataSize % 20) != 0: #check that total data size is a multiple of 20
@@ -46,6 +46,8 @@ def create_workspace(nodeNum,filePath,totalDataSize): #creates a headerless work
     node = nodeNum
     global itr
     itr = 1
+    global set_flag
+    set_flag = True
     otherNodes = [1,2,3,4,5]
     otherNodes.remove(nodeNum)
     fileSize = int(totalDataSize/5)

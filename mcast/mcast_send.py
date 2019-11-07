@@ -56,7 +56,7 @@ def send(node, stage, data):
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
     
     sock.sendto(datasend, (MCAST_GRP, MCAST_PORT))
-    print("sent")
+    print("sent stage ", stage)
     sock.close()
 
 
