@@ -33,15 +33,15 @@ def run():
     recv_stages = (1, 1, 2)
     threads = {}
     cache_q = queue.Queue()  # use of the fifo queue structure ensures safe exchange of data between threads
-    k = 1  #global counter
-    K = 5 # will be changed by data received from agg
+    k = 1  # global counter
+    K = 5  # will be changed by data received from agg (global iterations)
     for i in range(3):
         # create and start separate threads to receive from different nodes (node, stage, q, priority):
         threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes[i], recv_stages[i], cache_q, i + 1), daemon=False)
         threads[i].start()
         print('starting thread ', i + 1)
 
-    while k < K:
+    while k < K:  # main running loop
 
 
         print('I am ', nodeIP)
@@ -100,7 +100,7 @@ def run():
                     else:
                         cache_q.put(a)
                 if na:  # resends if it doesnt find data needed
-                    print("Resending")
+                    print("Resending, couldn't find ", cpart)
                     break
             if time.time() >= (time_init + 60):  # times out 60s of not receiving all 3 pieces of data
                 print("Error: threads timed out")

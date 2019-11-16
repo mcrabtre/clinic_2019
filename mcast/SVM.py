@@ -19,7 +19,7 @@ import Read
 def svm(w,data_pts,eta,lam,tau,d,weight,shuff=0,N=1,n=0):#,result,index): #,tau):
     l = len(w)
     fn = np.zeros(tau) # array of calculated loss functions for each local iteration (tau)
-    #tau hardcoded as zero to implement coded shuffling
+
     for t in range(0, int(tau)):
         x, y = Read.Read(d, data_pts, weight, offset=0) # weight modifies yread
         wT = w.transpose()

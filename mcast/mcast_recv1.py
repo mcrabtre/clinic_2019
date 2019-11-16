@@ -63,7 +63,7 @@ def m_recv(node, stage, q, priority):
         #print()
         #print(rec)
         if not(numpy.array_equal(rec, prev)):
-            print('received ', len(recvd), ' bytes of data from  node ', node, ' stage ', stage)
+            print('received ', len(recvd), ' bytes of data from node ', node, ' stage ', stage, ' priority ', priority)
             q.put((priority, rec))
             prev = rec
         sock.close()
