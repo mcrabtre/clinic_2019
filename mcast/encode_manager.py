@@ -26,7 +26,8 @@ import numpy as np
     
     **receiving**
     this manager completely automates the receiving process, it takes in 3 different partitions. Stage1_m is the 
-    partition received from the minor node, or the node wih the next successive node number.
+    coded partition received from the minor node, or the node wih the next successive node number. Stage1_M is the 
+    coded partition received from the major node, or the node 2 successive node numbers away from the receiving node.
 '''
 data_size = 20
 node = 0

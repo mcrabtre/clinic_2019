@@ -5,11 +5,11 @@ import numpy as np
 def test(size, iterations):
     nodes = [1,2,3,4,5]
     itr = 1
-    e.create_workspace(1, 'test.csv', size)
-    e.create_workspace(2, 'test.csv', size)
-    e.create_workspace(3, 'test.csv', size)
-    e.create_workspace(4, 'test.csv', size)
-    e.create_workspace(5, 'test.csv', size)
+    e.create_workspace(1, 'train.csv', size)
+    e.create_workspace(2, 'train.csv', size)
+    e.create_workspace(3, 'train.csv', size)
+    e.create_workspace(4, 'train.csv', size)
+    e.create_workspace(5, 'train.csv', size)
     while itr <= iterations:
         print('starting iteration ', itr)
         e.itr = itr
