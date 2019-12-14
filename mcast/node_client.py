@@ -26,7 +26,7 @@ def client(wout,fn,host):
     sel = selectors.DefaultSelector()
     
     server_addr = (host, port)
-    print('starting connection to', server_addr)
+    print('sending to Agg')
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(server_addr) #.connect_ex()
     sock.setblocking(0) # vs False
@@ -34,7 +34,7 @@ def client(wout,fn,host):
     sel.register(sock, selectors.EVENT_WRITE)
 
     while keep_running:
-        print('waiting for connection')
+        #print('waiting for connection')
         for key, mask in sel.select(timeout=None): #changed from 1 to None 11Nov
             conn = key.fileobj
             print(conn)
@@ -45,12 +45,12 @@ def client(wout,fn,host):
             sent = conn.send(datasend)
             totalsent += sent
             datasend = datasend[sent:]
-            print('sending data',totalsent)
+            #print('sending data',totalsent)
 
         print('data sent')
         keep_running = False
                 
-    print('shutting down')
+    #print('shutting down')
     sel.unregister(conn)
     conn.close()
     sel.close()
