@@ -21,7 +21,7 @@ import aggr_server
 import nodeDetection
 import med_avg
 import time
-import matplotlib.pyplot as pt
+import matplotlib.pyplot as plt
 #aggr_server(host,num_con,que)
 #isImported = False
 '''
@@ -46,7 +46,8 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
         print('waiting for 5 nodes')
         not5 = (iplist.__len__() != 5)
         time.sleep(1.0)
-    node_dict = {} 
+    tinit = time.thread_time()
+    node_dict = {}
 # assign node numbers
     print('assigning nodes')
     n = 0
@@ -59,12 +60,12 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
     if tau == 0:
         tau = N
     w = np.zeros(784)
-    fnfn = np.zeros(shape=(N+1,K*tau))
+    fnfn = np.zeros(shape=(K*tau, 5))
     accs = np.zeros(K)
     print('starting global updates')
 
 # Start global updates
-    for k in range (0, K): # aggregator as client, k global iterations
+    for k in range(0, K): # aggregator as client, k global iterations
         # send global update information to nodes
         # Currently using the same dataset throughout. change k=k to refresh data
         # d is number of data points per node work file (each node actually stores 2*d
@@ -78,8 +79,14 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
         # aggregator as server; get ws from nodes 
         result = aggr_server.aggr_server(host, N)
         ww = result.w
-        for i in range(0, N):
-            fnfn[i, k*tau:(k+1)*tau] = result.fn[i*tau:i*tau+tau]
+        # average loss function across all nodes
+        for i in range(0, tau):
+            fnfn[i + k * (tau - 1), 0] = result.fn[i]
+            fnfn[i + k * (tau - 1), 1] = result.fn[i + (tau - 1)]
+            fnfn[i + k * (tau - 1), 2] = result.fn[i + 2 * (tau - 1)]
+            fnfn[i + k * (tau - 1), 3] = result.fn[i + 3 * (tau - 1)]
+            fnfn[i + k * (tau - 1), 4] = result.fn[i + 4 * (tau - 1)]
+
         # Process the w
         if avc == 1:
             w = med_avg.med(ww)
@@ -90,13 +97,13 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
         data.w = w  # update w in data
 
         accs[k] = AccTest.AccTest(w)
-    fnfn[-1, :] = med_avg.mean(fnfn[0:-1, :])  # average all loss functions
+    tfin = time.thread_time()
+    t_total = tfin-tinit
     # Graph the loss functions
-    av_types = ['mean', 'median', 'med_avg']
-    label = 'Coded shuffling and %s processing' % (av_types[avc])
-    ParsFile.ParsFile(np.transpose(fnfn), label)
+    plt.plot(fnfn)
+    plt.title('Loss Functions for each Node')
     print(accs)
-    return w, fnfn, accs
+    return t_total
 
 
 run()
