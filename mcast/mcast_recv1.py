@@ -55,8 +55,9 @@ def m_recv(node, stage, q, priority):
         on = True
         while on:
             #print('Attempting to receive from ', MCAST_GRP, MCAST_PORT)
-            recvd, addr = sock.recvfrom(buff)
-            if recvd:
+            recd, addr = sock.recvfrom(buff)
+            recvd = recvd + recd
+            if recd.__len__() < buff:
                 on = False
         rec = pickle.loads(recvd)
         #print('Received Data')

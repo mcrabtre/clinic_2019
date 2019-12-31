@@ -48,14 +48,21 @@ def send(node, stage, data):
         }
     MCAST_GRP = ip_switcher.get(node, '0.0.0.0')
     MCAST_PORT = port_switcher.get(node, 0000)
-    data = data # data has properties .w .nodenum .tau .k
+    data = data  # data has properties .w .nodenum .tau .k
     #= b'0xff' + y
     #need to tune send buffers
+
     datasend = pickle.dumps(data) #will ditch pickle later, its garbage
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
-    
-    sock.sendto(datasend, (MCAST_GRP, MCAST_PORT))
+    buff = sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+    if len(datasend) > buff:  # break large send data into buff sized pieces to send individually
+        pcs = int(datasend.__len__()/buff)
+        for i in range(pcs):
+            sock.sendto(datasend[i*buff:(i+1)*buff], (MCAST_GRP, MCAST_PORT))
+        sock.sendto(datasend[pcs*buff:datasend.__len__()], (MCAST_GRP, MCAST_PORT))
+    else:
+        sock.sendto(datasend, (MCAST_GRP, MCAST_PORT))
     print("sent stage ", stage)
     sock.close()
 
