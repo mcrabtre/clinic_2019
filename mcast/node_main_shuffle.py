@@ -41,7 +41,7 @@ def run():
         threads[i].start()
         print('starting thread ', i + 1)
 
-    while k < K:  # main running loop
+    while True:  # main running loop
 
 
         print('I am ', nodeIP)
