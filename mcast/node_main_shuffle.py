@@ -37,7 +37,7 @@ def run():
     K = 5  # will be changed by data received from agg (global iterations)
     for i in range(1):
         # create and start separate threads to receive from different nodes (node, stage, q, priority):
-        threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes[i], recv_stages[i], cache_q, i + 1), daemon=False)
+        threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes, recv_stages, cache_q, i + 1), daemon=False)
         threads[i].start()
         print('starting thread ', i + 1)
 
