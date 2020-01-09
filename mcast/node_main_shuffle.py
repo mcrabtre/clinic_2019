@@ -85,6 +85,7 @@ def run():
             mcast_send.send(n, 2, e.stage2_send())  # send stage2 partition
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             print('training')
+            data_pts = data_pts.astype('float64')
             w, fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n - 1) #train on tau iterations data_pts d
             while cpart < 4:
                 cp = cpart  # need this to ensure queue is completely cycled before searching for the next part
