@@ -5,28 +5,7 @@ import pandas as pd
 import numpy as np
 
 '''
-    **data partitions**
-    This module manages data partitions and subpartitions for encoded shuffling including 5 nodes.
-    Total data size must be some multiple of 20 data pts. The data set is divided into 5 distinct files. 
-    each node has 1 file in addition to 1/4 of each other nodes file to make a total of 2 file sizes
-    per node. This data is stored in a work.csv file in the encode_manager directory, which is routinely 
-    read from and rewritten as data shuffling occurs. 
     
-    **encoding/decoding**
-    encoding is a bitwise XOR operation on two file partitions, this results in an encoded partition 
-    decoded is a bitwise XOR operation on the encoded partition and one of its original file partitions.
-    This enables the data of both partitions to be contained within the encoded, a partitions data is 
-    recovered using the other partition it was encoded to.
-    
-    **shuffling stages**
-    shuffling takes place in two stages, the encode send stage, and the cleanup stage. The encode send stage 
-    encodes two partitions and sends it, eventually this will be received by two other nodes. Stage 2 is a 
-    single non-coded partition. These two stages were necessary for the entire data set to be shuffled among the nodes
-    each iteration. 
-    
-    **receiving**
-    this manager completely automates the receiving process, it takes in 3 different partitions. Stage1_m is the 
-    partition received from the minor node, or the node wih the next successive node number.
 '''
 data_size = 20
 node = 0

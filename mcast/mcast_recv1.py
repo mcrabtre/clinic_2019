@@ -2,7 +2,7 @@ import socket
 import struct
 import pickle
 import numpy
-import queue
+#import queue
 
 kill = False
 
@@ -71,6 +71,6 @@ def m_recv(node, stage, q, priority):
         sock.close()
 
 
-qu = queue.Queue()
-m_recv(1, 1, qu, 1)
-print('at the bottom of the ocean')
+#qu = queue.Queue()
+#m_recv(1, 1, qu, 1)
+#print('at the bottom of the ocean')
