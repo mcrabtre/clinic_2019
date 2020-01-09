@@ -34,7 +34,6 @@ def run():
     threads = {}
     cache_q = queue.Queue()  # use of the fifo queue structure ensures safe exchange of data between threads
     k = 1  # global counter
-    K = 5  # will be changed by data received from agg (global iterations)
     for i in range(1):
         # create and start separate threads to receive from different nodes (node, stage, q, priority):
         threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes, recv_stages, cache_q, i + 1), daemon=False)
@@ -57,7 +56,9 @@ def run():
         Num = len(info.node_dict)  # total number of nodes (should be 5)
         d = info.d  # number data points/node
         tau = info.tau  # number of local iterations
-        K = info.K  # global iteration number
+        k = info.k  # global iteration number
+        if k == 0:
+            e.set_flag = False
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
         
