@@ -100,8 +100,10 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
     tfin = time.thread_time()
     t_total = tfin-tinit
     # Graph the loss functions
+
     plt.plot(fnfn)
     plt.title('Loss Functions for each Node')
+    plt.show()
     print(accs)
     return t_total
 

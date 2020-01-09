@@ -82,6 +82,7 @@ def run():
             mcast_send.send(n, 1, e.get_work_file())  # send data to other node
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             print('training')
+            data_pts = data_pts.astype('float64')
             w, fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n - 1) #train on tau iterations data_pts d
             if not cache_q.qsize() == 0:
                 a = cache_q.get()  # tuple in form (priority integer, DATA)
