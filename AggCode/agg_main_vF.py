@@ -6,24 +6,15 @@ Created on Sat Mar 30 10:47:30 2019
 """
 
 import numpy as np
-#import pandas as pd
 import types
 import AccTest
-#import queue
-#from threading import Thread
-import ParsFile_v2_1 as ParsFile
-#from med_avg import med_avg
-#import SVM
-#import mcast_send
-#import MakeFile
 import aggr_client_v1_3 as aggr_client
 import aggr_server
 import nodeDetection
 import med_avg
 import time
 import matplotlib.pyplot as plt
-#aggr_server(host,num_con,que)
-#isImported = False
+
 '''
     The main of the system. It will initialize conditions and detect available nodes and 
     assumes that all devices connected to the router are ready to act as a node.
@@ -36,7 +27,7 @@ import matplotlib.pyplot as plt
 '''
 
 
-def run(K=5, tau=0, avc=0, d=4, shuff=2):
+def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
     router_ip = '192.168.0.1'
     not5 = True
     while not5:
@@ -100,17 +91,42 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2):
     tfin = time.thread_time()
     t_total = tfin-tinit
     # Graph the loss functions
-
-    plt.plot(fnfn)
-    plt.title('Loss Functions for each Node')
-    plt.show()
+    if not graph:
+        plt.plot(fnfn)
+        plt.title('Loss Functions for each Node')
+        plt.show()
     print(accs)
     return t_total
 
 
-run()
+# this is the limits test
+dt = list(range(4, 53, 4))
+time_u = np.zeros(shape=(len(dt)))
+time_m = np.zeros(shape=(len(dt)))
+for i in range(len(dt)):
+    times = 0.0
+    for j in range(5):
+        print('unicast running... ', dt[i], ' data points, ', j, ' of 5 iterations')
+        tim = run(d=dt[i])
+        times = times + tim
+    time_u[i] = times/5
+print('unicast times are ', time_u)
+input('please press enter to continue:')
 
+for i in range(len(dt)):
+    times = 0.0
+    for j in range(5):
+        print('multicast running... ', dt[i], ' data points, ', j, ' of 5 iterations')
+        tim = run(d=dt[i])
+        times = times + tim
+    time_m[i] = times/5
+print('multicast times are ', time_u)
+plot_times = np.array([time_u, time_m]).T
+plot_data_pts = np.array(dt)
+plt.plot(plot_data_pts, plot_times)
+plt.title('Average training times for Unicast vs Multicast')
+plt.legend(('Unicast', 'Multicast'))
+plt.show()
 
-#ssh pi@192.168.0.
 
 
