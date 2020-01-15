@@ -9,7 +9,7 @@ import pandas as pd
 
 
 def pandaRead(numPoints, filepath=r"train.csv", offset=0, case=None):
-	filepath = r'../mcast/train.csv'
+	filepath = r'train.csv'
 	data = pd.read_csv(filepath, skiprows=(numPoints*(offset)), nrows=numPoints).values
 	D,L = np.shape(data)
 

@@ -21,7 +21,7 @@ def svm(w,data_pts,eta,lam,tau,d,weight,shuff=0,N=1,n=0):#,result,index): #,tau)
     fn = np.zeros(tau) # array of calculated loss functions for each local iteration (tau)
 
     for t in range(0, int(tau)):
-        x, y = Read.Read(d, data_pts, weight, offset=0) # weight modifies yread
+        x, y = Read.Read(d, data_pts, weight, offset=0) # weight modifies yread Read(numPoints, data, weight, offset=0)
         wT = w.transpose()
         dfn = np.zeros(l)
         for j in range(0 , d):           

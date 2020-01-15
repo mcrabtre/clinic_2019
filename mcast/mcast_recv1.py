@@ -50,7 +50,7 @@ def m_recv(node, stage, q, priority):
         mreq = struct.pack("=4sl", group, socket.INADDR_ANY)
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 81920)  # max buff size for pi /proc/sys/net/core/rmem_max
-        buff = 1472  # not (necessarily) the same as set value
+        buff = 1470  # not (necessarily) the same as set value
         sock.bind(server_addr)
         recvd = b''
         on = True
