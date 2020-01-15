@@ -8,7 +8,7 @@ import numpy as np
 def AccTest(ww,testpoints=2000):
 	totalpoints = 42000
 	w = ww
-	filepath = r'train.csv'
+	filepath = r'../mcast/train.csv'
 	testfile = filepath
 	data = pd.read_csv(testfile, nrows=testpoints, skiprows = totalpoints-testpoints).values
 	x, y = pandaRead(testpoints, data,0)
