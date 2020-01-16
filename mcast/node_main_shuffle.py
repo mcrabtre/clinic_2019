@@ -58,7 +58,9 @@ def run():
         tau = info.tau  # number of local iterations
         k = info.k  # global iteration number
         if k == 0:
+            print('beginning session')
             e.set_flag = False
+            mcast_recv1.prev = 0
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
         
@@ -80,7 +82,8 @@ def run():
         # time.sleep(0.1*(5-n))
 
         while shuffcount <= shuff:  # main coded shuffling running loop (for shuff iterations)
-            mcast_send.send(n, 1, e.get_work_file())  # send data to other node
+            for i in range(3):
+                mcast_send.send(n, 1, e.get_work_file())  # send data to other node 3 times as redundancy
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             print('training')
             data_pts = data_pts.astype('float64')
