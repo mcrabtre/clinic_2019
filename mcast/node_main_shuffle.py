@@ -97,6 +97,7 @@ def run():
                 shuffcount = shuffcount + 1
             else:
                 print('Resending could not assert data')
+                time.sleep(1)
 
             if time.time() >= (time_init + 60):  # times out 60s of not receiving data
                 print("Error: threads timed out")
@@ -112,3 +113,4 @@ def run():
 
 while True:
     run()
+    time.sleep(1)
