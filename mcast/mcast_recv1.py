@@ -5,10 +5,11 @@ import numpy
 #import queue
 
 kill = False
+prev = 0
 
 
 def m_recv(node, stage, q, priority):
-    prev = 0
+    global prev
     while not kill:
         if stage == 1:
             ip_switcher = {

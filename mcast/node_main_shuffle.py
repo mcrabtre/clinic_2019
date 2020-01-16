@@ -57,8 +57,11 @@ def run():
         d = info.d  # number data points/node
         tau = info.tau  # number of local iterations
         k = info.k  # global iteration number
+        K = info.K # total global iterations
         if k == 0:
+            print('beginning session')
             e.set_flag = False
+            mcast_recv1.prev = 0
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
         
@@ -122,4 +125,6 @@ def run():
         print('Threads killed')
 
 
-run()
+while True:
+    run()
+    time.sleep(1)
