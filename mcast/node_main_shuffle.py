@@ -33,14 +33,15 @@ def run():
     recv_stages = 1
     threads = {}
     cache_q = queue.Queue()  # use of the fifo queue structure ensures safe exchange of data between threads
-    k = 1  # global counter
+    K = 1  # total global counter
+    k = 0 # global iteration
     for i in range(1):
         # create and start separate threads to receive from different nodes (node, stage, q, priority):
         threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes, recv_stages, cache_q, i + 1), daemon=False)
         threads[i].start()
         print('starting thread ', i + 1)
 
-    while True:  # main running loop
+    while k < K:  # main running loop
 
 
         print('I am ', nodeIP)
@@ -57,6 +58,7 @@ def run():
         d = info.d  # number data points/node
         tau = info.tau  # number of local iterations
         k = info.k  # global iteration number
+        K = info.K # total global iterations
         if k == 0:
             print('beginning session')
             e.set_flag = False
@@ -108,4 +110,5 @@ def run():
         print('Threads killed')
 
 
-run()
+while True:
+    run()

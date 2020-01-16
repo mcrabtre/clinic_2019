@@ -60,7 +60,7 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
         # send global update information to nodes
         # Currently using the same dataset throughout. change k=k to refresh data
         # d is number of data points per node work file (each node actually stores 2*d
-        data = types.SimpleNamespace(w=w, k=k, host=host, node_dict=node_dict, d=d, tau=tau, shuff=shuff)#data_pts=data_pts) #data on nodes
+        data = types.SimpleNamespace(w=w, k=k, K=K, host=host, node_dict=node_dict, d=d, tau=tau, shuff=shuff)#data_pts=data_pts) #data on nodes
 
         # Send Data
         # mcast_send.send(data) # alternative to sending to nodes one at a time.
