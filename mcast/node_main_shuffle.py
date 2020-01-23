@@ -62,6 +62,9 @@ def run():
             print('beginning session')
             e.set_flag = False
             mcast_recv1.prev = 0
+            if not cache_q.empty(): #
+                for i in range(cache_q.qsize()):
+                    cache_q.get()
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
         
@@ -91,9 +94,9 @@ def run():
             print('training')
             data_pts = data_pts.astype('float64')
             w, fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n - 1) #train on tau iterations data_pts d
+            try_time = time.time()
             while cpart < 4:
-                cp = cpart  # need this to ensure queue is completely cycled before searching for the next part
-                na = True
+                cp = cpart  # need this to ensure fifo queue is completely cycled before searching for the next part
                 for i in range(cache_q.qsize()):  # cycle through the queue for receive data
                     a = cache_q.get()  # tuple in form (part integer, DATA)
                     if a[0] == cp:  # if it is the part needed adds part to ans_data and increments to next part
@@ -101,15 +104,14 @@ def run():
                         ans_data[cpart - 1] = a
                         print('got part ', cpart)
                         cpart = cpart + 1
-                        na = False
                     else:
                         cache_q.put(a)
-                if na:  # resends if it doesnt find data needed
-                    print("Resending, couldn't find ", cpart)
+                if time.time() >= try_time + 5:  # resend if it doesnt find data after 5 seconds
+                    print("Resending, couldn't find part ", cpart)
                     break
             if time.time() >= (time_init + 60):  # times out 60s of not receiving all 3 pieces of data
                 print("Error: threads timed out")
-                break
+                exit(-1)
             if cpart >= 4:  # receive condition triggers when all data is ready
                 print('data received')
                 e.recv(ans_data[0][1], ans_data[1][1], ans_data[2][1])
