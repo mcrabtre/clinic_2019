@@ -84,20 +84,24 @@ def run():
         # time.sleep(0.1*(5-n))
 
         while shuffcount <= shuff:  # main coded shuffling running loop (for shuff iterations)
-            for i in range(3):
+            for i in range(1):
                 mcast_send.send(n, 1, e.get_work_file())  # send data to other node 3 times as redundancy
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             print('training')
             data_pts = data_pts.astype('float64')
             w, fn = SVM.svm(w, data_pts, eta, lam, tau, d, weight, shuff=0, N=Num, n=n - 1) #train on tau iterations data_pts d
-            if not cache_q.qsize() == 0:
-                a = cache_q.get()  # tuple in form (priority integer, DATA)
-                e.recv(a[1])
-                time_init = time.time()
-                shuffcount = shuffcount + 1
-            else:
-                print('Resending could not assert data')
-                time.sleep(1)
+            try_time = time.time()
+            receive_flag = False
+            while not receive_flag:
+                if not cache_q.qsize() == 0:
+                    a = cache_q.get()  # tuple in form (priority integer, DATA)
+                    e.recv(a[1])
+                    time_init = time.time()
+                    receive_flag = True
+                    shuffcount = shuffcount + 1
+                if time.time() >= try_time + 5:  # re-sends after not receiving for 5s
+                    print('Resending could not assert data')
+                    break
 
             if time.time() >= (time_init + 60):  # times out 60s of not receiving data
                 print("Error: threads timed out")
