@@ -63,6 +63,9 @@ def run():
             print('beginning session')
             e.set_flag = False
             mcast_recv1.prev = 0
+            if not cache_q.empty(): #
+                for i in range(cache_q.qsize()):
+                    cache_q.get()
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
         
