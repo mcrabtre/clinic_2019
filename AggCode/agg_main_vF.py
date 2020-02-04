@@ -106,7 +106,7 @@ time_m = np.zeros(shape=(len(dt)))
 for i in range(len(dt)):
     times = 0.0
     for j in range(1):
-        print('unicast running... ', dt[i], ' data points, ', j, ' of 5 iterations')
+        print('unicast running... ', dt[i], ' data points, ', j, ' of 1 iterations')
         tim = run(d=dt[i])
         times = times + tim
     time_u[i] = times/1
@@ -115,11 +115,11 @@ input('please press enter to continue:')
 
 for i in range(len(dt)):
     times = 0.0
-    for j in range(5):
-        print('multicast running... ', dt[i], ' data points, ', j, ' of 5 iterations')
+    for j in range(1):
+        print('multicast running... ', dt[i], ' data points, ', j, ' of 1 iterations')
         tim = run(d=dt[i])
         times = times + tim
-    time_m[i] = times/5
+    time_m[i] = times/1
 print('multicast times are ', time_u)
 plot_times = np.array([time_u, time_m]).T
 plot_data_pts = np.array(dt)
