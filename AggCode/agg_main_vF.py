@@ -71,12 +71,12 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
         result = aggr_server.aggr_server(host, N)
         ww = result.w
         # average loss function across all nodes
-        for i in range(0, tau):
-            fnfn[i + k * (tau - 1), 0] = result.fn[i]
-            fnfn[i + k * (tau - 1), 1] = result.fn[i + (tau - 1)]
-            fnfn[i + k * (tau - 1), 2] = result.fn[i + 2 * (tau - 1)]
-            fnfn[i + k * (tau - 1), 3] = result.fn[i + 3 * (tau - 1)]
-            fnfn[i + k * (tau - 1), 4] = result.fn[i + 4 * (tau - 1)]
+        for j in range(0, tau):
+            fnfn[j + k * (tau - 1), 0] = result.fn[j]
+            fnfn[j + k * (tau - 1), 1] = result.fn[j + (tau - 1)]
+            fnfn[j + k * (tau - 1), 2] = result.fn[j + 2 * (tau - 1)]
+            fnfn[j + k * (tau - 1), 3] = result.fn[j + 3 * (tau - 1)]
+            fnfn[j + k * (tau - 1), 4] = result.fn[j + 4 * (tau - 1)]
 
         # Process the w
         if avc == 1:
@@ -91,7 +91,7 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
     tfin = time.thread_time()
     t_total = tfin-tinit
     # Graph the loss functions
-    if not graph:
+    if graph:
         plt.plot(fnfn)
         plt.title('Loss Functions for each Node')
         plt.show()
@@ -100,26 +100,26 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
 
 
 # this is the limits test
-dt = list(range(4, 53, 4))
+dt = list(range(52, 101, 4))
 time_u = np.zeros(shape=(len(dt)))
 time_m = np.zeros(shape=(len(dt)))
 for i in range(len(dt)):
     times = 0.0
-    for j in range(5):
-        print('unicast running... ', dt[i], ' data points, ', j, ' of 5 iterations')
+    for j in range(1):
+        print('unicast running... ', dt[i], ' data points, ', j, ' of 1 iterations')
         tim = run(d=dt[i])
         times = times + tim
-    time_u[i] = times/5
+    time_u[i] = times/1
 print('unicast times are ', time_u)
 input('please press enter to continue:')
 
 for i in range(len(dt)):
     times = 0.0
-    for j in range(5):
-        print('multicast running... ', dt[i], ' data points, ', j, ' of 5 iterations')
+    for j in range(1):
+        print('multicast running... ', dt[i], ' data points, ', j, ' of 1 iterations')
         tim = run(d=dt[i])
         times = times + tim
-    time_m[i] = times/5
+    time_m[i] = times/1
 print('multicast times are ', time_u)
 plot_times = np.array([time_u, time_m]).T
 plot_data_pts = np.array(dt)
