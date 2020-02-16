@@ -47,6 +47,10 @@ def test(size, iterations):
     print("End of Test")
 
 
+test(20, 20)
+
+
+
 
 
 

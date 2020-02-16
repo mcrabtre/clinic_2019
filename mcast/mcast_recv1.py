@@ -51,16 +51,19 @@ def m_recv(node, stage, q, priority):
         mreq = struct.pack("=4sl", group, socket.INADDR_ANY)
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 81920)  # max buff size for pi /proc/sys/net/core/rmem_max
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        sock.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_TTL, 20)
+        sock.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_LOOP, 1)
         buff = 1470  # not (necessarily) the same as set value
         sock.bind(server_addr)
         recvd = b''
-        on = True
-        while on:
+        while True:
             #print('Attempting to receive from ', MCAST_GRP, MCAST_PORT)
-            recd, addr = sock.recvfrom(buff)
-            recvd = recvd + recd
-            if recd.__len__() < buff:
-                on = False
+            part = sock.recv(buff)
+            recvd = recvd + part
+            if len(part) < buff:
+                break
         rec = pickle.loads(recvd)
         #print('Received Data')
         #print()
