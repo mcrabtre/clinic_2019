@@ -7,10 +7,8 @@ Created on Sun Feb  3 09:59:11 2019
 
 
 import socket
-import types
+import time
 import pickle
-import numpy as np
-#import pandas as pd
 
 
 # cannot send more than 65k bytes at a time (at least to pis)
@@ -60,6 +58,7 @@ def send(node, stage, data):
         pcs = int(datasend.__len__()/buff)
         for i in range(pcs):
             sock.sendto(datasend[i*buff:(i+1)*buff], (MCAST_GRP, MCAST_PORT))
+            time.sleep(0.01) #gives socket time to recv
         sock.sendto(datasend[pcs*buff:datasend.__len__()], (MCAST_GRP, MCAST_PORT))
     else:
         sock.sendto(datasend, (MCAST_GRP, MCAST_PORT))
