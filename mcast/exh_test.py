@@ -38,7 +38,7 @@ def test(size, iterations):
         #check integrity of files
         for i in nodes:
             e.node = i
-            if not np.array_equal(curWf[i-1],nextWf[e.cycle5(i-1)-1]):
+            if not np.array_equal(curWf[i-1], nextWf[e.cycle5(i-1)-1]):
                 print('problem with node ', i, ' at iteration ', itr)
                 #print('work file is ', nextWf[e.cycle5(i-1)-1],' should be ', curWf[i-1])
         itr = itr + 1
