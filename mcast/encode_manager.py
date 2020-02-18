@@ -28,6 +28,10 @@ import numpy as np
     this manager completely automates the receiving process, it takes in 3 different partitions. Stage1_m is the 
     coded partition received from the minor node, or the node wih the next successive node number. Stage1_M is the 
     coded partition received from the major node, or the node 2 successive node numbers away from the receiving node.
+    The recv function automates the process of decoding and reordering the data in order to be used for training and 
+    successive sends. This is done through a number of mutation arrays that track the location of each data piece.
+    These arrays are mutated each shuffling iteration indicated by global variable itr. The use of cycle4 and cycle5
+    functions (identical to mod4 and mod5) is to simplify the process of 
 '''
 data_size = 20
 node = 0
@@ -122,7 +126,7 @@ def recv(stage1_m, stage1_M, stage2):
         decodeM_mut.insert(4, decodeM_mut.pop(0))
         wret_part_mut.insert(4, wret_part_mut.pop(0))
         ret_part_mut.insert(4, ret_part_mut.pop(0))
-    # the below file accesses are for each part of the new stored data, may consider doing just one access for speed
+    # the below file accesses are for each part of the new stored data, consider doing just one access for speed
     decM = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(decodeM_mut[node-1]-1)*part_size, nrows=part_size).values
     decm = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(decodem_mut[node-1]-1)*part_size, nrows=part_size).values
     R = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(wret_part_mut[node-1]-1)*part_size, nrows=part_size).values
