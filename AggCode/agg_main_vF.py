@@ -37,7 +37,7 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, pad_value=1, graph=False):
         print('waiting for 5 nodes')
         not5 = (iplist.__len__() != 5)
         time.sleep(1.0)
-    tinit = time.thread_time()
+    tinit = time.time()
     node_dict = {}
 # assign node numbers
     print('assigning nodes')
@@ -88,7 +88,7 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, pad_value=1, graph=False):
         data.w = w  # update w in data
 
         accs[k] = AccTest.AccTest(w)
-    tfin = time.thread_time()
+    tfin = time.time()
     t_total = tfin-tinit
     # Graph the loss functions
     if graph:
