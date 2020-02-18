@@ -13,6 +13,7 @@ import threading
 import time
 import mcast_recv1
 import mcast_send
+import pad
 '''
     Main for the nodes. Starts and waits for data from agg. once received it unpacks data and runs the coded shuffle
     svm. It then sends the w vector and loss functions back to the agg.
@@ -59,6 +60,7 @@ def run():
         tau = info.tau  # number of local iterations
         k = info.k  # global iteration number
         K = info.K # total global iterations
+        pad_value = info.pad_value #padding value of data for testing
         if k == 0:
             print('beginning session')
             e.set_flag = False
@@ -88,7 +90,8 @@ def run():
 
         while shuffcount <= shuff:  # main coded shuffling running loop (for shuff iterations)
             for i in range(1):
-                mcast_send.send(n, 1, e.get_work_file())  # send data to other node 3 times as redundancy
+                send_data = pad.pad(e.get_work_file(), pad_value)
+                mcast_send.send(n, 1, send_data)  # send data to other node 3 times as redundancy
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             print('training')
             data_pts = data_pts.astype('float64')
@@ -97,8 +100,8 @@ def run():
             receive_flag = False
             while not receive_flag:
                 if not cache_q.qsize() == 0:
-                    a = cache_q.get()  # tuple in form (priority integer, DATA)
-                    e.recv(a[1])
+                    a = cache_q.get()  # tuple in form a = (priority integer, DATA)
+                    e.recv(pad.unpad(a[1], pad_value))
                     time_init = time.time()
                     receive_flag = True
                     shuffcount = shuffcount + 1

@@ -2,7 +2,7 @@
 """
 Created on Sat Mar 30 10:47:30 2019
 
-@author: hokis
+@author: mcrabtre
 """
 
 import numpy as np
@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 '''
 
 
-def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
+def run(K=5, tau=0, avc=0, d=4, shuff=2, pad_value=1, graph=False):
     router_ip = '192.168.0.1'
     not5 = True
     while not5:
@@ -60,7 +60,7 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
         # send global update information to nodes
         # Currently using the same dataset throughout. change k=k to refresh data
         # d is number of data points per node work file (each node actually stores 2*d
-        data = types.SimpleNamespace(w=w, k=k, K=K, host=host, node_dict=node_dict, d=d, tau=tau, shuff=shuff)#data_pts=data_pts) #data on nodes
+        data = types.SimpleNamespace(w=w, k=k, K=K, host=host, pad_value=pad_value, node_dict=node_dict, d=d, tau=tau, shuff=shuff)#data_pts=data_pts) #data on nodes
 
         # Send Data
         # mcast_send.send(data) # alternative to sending to nodes one at a time.
@@ -100,32 +100,36 @@ def run(K=5, tau=0, avc=0, d=4, shuff=2, graph=False):
 
 
 # this is the limits test
-dt = list(range(52, 101, 4))
+dt = list(range(1, 21, 1))
 time_u = np.zeros(shape=(len(dt)))
 time_m = np.zeros(shape=(len(dt)))
 for i in range(len(dt)):
     times = 0.0
     for j in range(1):
-        print('unicast running... ', dt[i], ' data points, ', j, ' of 1 iterations')
-        tim = run(d=dt[i])
+        print('unicast running... ', dt[i], ' X data padding, ', j+1, ' of 1 iterations')
+        tim = run(pad_value=dt[i])
         times = times + tim
     time_u[i] = times/1
+    print(time_u[i], ' seconds')
 print('unicast times are ', time_u)
 input('please press enter to continue:')
 
 for i in range(len(dt)):
     times = 0.0
     for j in range(1):
-        print('multicast running... ', dt[i], ' data points, ', j, ' of 1 iterations')
-        tim = run(d=dt[i])
+        print('multicast running... ', dt[i], ' X data padding, ', j+1, ' of 1 iterations')
+        tim = run(pad_value=dt[i])
         times = times + tim
     time_m[i] = times/1
-print('multicast times are ', time_u)
+    print(time_m[i], ' seconds')
+print('multicast times are ', time_m)
 plot_times = np.array([time_u, time_m]).T
 plot_data_pts = np.array(dt)
 plt.plot(plot_data_pts, plot_times)
 plt.title('Average training times for Unicast vs Multicast')
 plt.legend(('Unicast', 'Multicast'))
+plt.xlabel('Data Padding Factor')
+plt.ylabel('Completion Time (seconds)')
 plt.show()
 
 
