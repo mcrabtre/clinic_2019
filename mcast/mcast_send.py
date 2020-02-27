@@ -11,7 +11,6 @@ import time
 import pickle
 
 
-# cannot send more than 65k bytes at a time (at least to pis)
 def send(node, stage, data):
     print("sending")
     if stage == 1:

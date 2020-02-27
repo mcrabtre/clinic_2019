@@ -126,20 +126,31 @@ def recv(stage1_m, stage1_M, stage2):
         decodeM_mut.insert(4, decodeM_mut.pop(0))
         wret_part_mut.insert(4, wret_part_mut.pop(0))
         ret_part_mut.insert(4, ret_part_mut.pop(0))
-    # the below file accesses are for each part of the new stored data, consider doing just one access for speed
-    decM = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(decodeM_mut[node-1]-1)*part_size, nrows=part_size).values
-    decm = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(decodem_mut[node-1]-1)*part_size, nrows=part_size).values
-    R = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(wret_part_mut[node-1]-1)*part_size, nrows=part_size).values
+    # the below file accesses are for each part of the new stored data (see line 131)
+    data_file_size = 2*(data_size / 5)
+    data_file = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=0, nrows=data_file_size).values
+    # changed to single file access 2/25/2020
+    #decM = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(decodeM_mut[node-1]-1)*part_size, nrows=part_size).values
+    decM = data_file[(4*part_size)+(decodeM_mut[node-1]-1)*part_size:(4*part_size)+(decodeM_mut[node-1])*part_size, :]
+    #decm = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(decodem_mut[node-1]-1)*part_size, nrows=part_size).values
+    decm = data_file[(decodem_mut[node-1]-1)*part_size:(decodem_mut[node-1])*part_size, :]
+    #R = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size)+(wret_part_mut[node-1]-1)*part_size, nrows=part_size).values
+    R = data_file[(4*part_size)+(wret_part_mut[node-1]-1)*part_size:(4*part_size)+(wret_part_mut[node-1])*part_size, :]
     #print('node ', node, ' itr ', itr, ' R is ', R)
     if ret_part_mut[node-1] == 5: #bandaid bug fix :(
-        pre_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(5*part_size), nrows=(3*part_size)).values
+        #pre_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(5*part_size), nrows=(3*part_size)).values
+        pre_ret = data_file[(5*part_size):(8*part_size), :]
     else:
-        pre_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size), nrows=part_size*(ret_part_mut[node-1]-1)).values
-    ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(ret_file_mut[node-1]-1)*part_size, nrows=part_size).values
+        #pre_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(4*part_size), nrows=part_size*(ret_part_mut[node-1]-1)).values
+        pre_ret = data_file[(4*part_size):part_size*(ret_part_mut[node-1]+3), :]
+    #ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=(ret_file_mut[node-1]-1)*part_size, nrows=part_size).values
+    ret = data_file[(ret_file_mut[node-1]-1)*part_size:(ret_file_mut[node-1])*part_size, :]
     if ret_part_mut[node-1] < 4: #bandaid bug fix :-(
-        post_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows= part_size*(4+ret_part_mut[node-1]), nrows=part_size*(4 - ret_part_mut[node-1])).values
+        #post_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows= part_size*(4+ret_part_mut[node-1]), nrows=part_size*(4 - ret_part_mut[node-1])).values
+        post_ret = data_file[part_size*(4+ret_part_mut[node-1]):(part_size*8), :]
     else:
-        post_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=0, nrows=0).values
+        #post_ret = pd.read_csv('work' + str(node) + '.csv', header=None, dtype='uint8', skiprows=0, nrows=0).values
+        post_ret = data_file[0:0, :]
     #print('node ', node, ' itr ', itr, ' pre ret is ', pre_ret, ' ret is ', ret, ' post ret is ', post_ret)
     S1M = decode(decM, stage1_M) # decodes data recieved from the Major (furthest away) node
     S1m = decode(decm, stage1_m) # decodes data recieved from the minor (closest) node

@@ -1,5 +1,6 @@
 import encode_manager as e
 import numpy as np
+import time
 
 
 def test(size, iterations):
@@ -27,15 +28,20 @@ def test(size, iterations):
             curWf[i-1] = e.get_work_file()
         nextWf = [0,0,0,0,0]
         #fill next work files
+        recv_time = 0
         for i in nodes:
             if e.itr != itr:
                 e.itr = itr
             e.node = i
             (s1m, s1M, s2) = e.node_tracker()
+            time_initial = time.time()
             e.recv(stage1s[s1m-1], stage1s[s1M-1], stage2s[s2-1])
+            time_final = time.time()
+            recv_time = recv_time + (time_final - time_initial)
             nextWf[i - 1] = e.get_work_file()
             e.itr = itr
         #check integrity of files
+        print('receive time is ', recv_time/5)
         for i in nodes:
             e.node = i
             if not np.array_equal(curWf[i-1], nextWf[e.cycle5(i-1)-1]):
