@@ -11,7 +11,6 @@ import time
 import pickle
 
 
-# cannot send more than 65k bytes at a time (at least to pis)
 def send(node, stage, data):
     print("sending")
     if stage == 1:
@@ -52,16 +51,19 @@ def send(node, stage, data):
     datasend = pickle.dumps(data) #will ditch pickle later, its garbage
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
-    buff = 1470
+    buff = 1466
 
     if len(datasend) > buff:  # break large send data into buff sized pieces to send individually
         pcs = int(datasend.__len__()/buff)
         for i in range(pcs):
-            sock.sendto(datasend[i*buff:(i+1)*buff], (MCAST_GRP, MCAST_PORT))
+            head = i.to_bytes(4, 'big')
+            sock.sendto(head + datasend[i*buff:(i+1)*buff], (MCAST_GRP, MCAST_PORT))
             time.sleep(0.01) #gives socket time to recv
-        sock.sendto(datasend[pcs*buff:datasend.__len__()], (MCAST_GRP, MCAST_PORT))
+        head = pcs.to_bytes(4, 'big')
+        sock.sendto(head + datasend[pcs*buff:datasend.__len__()], (MCAST_GRP, MCAST_PORT))
     else:
-        sock.sendto(datasend, (MCAST_GRP, MCAST_PORT))
+        head = int(0).to_bytes(4, 'big')
+        sock.sendto(head + datasend, (MCAST_GRP, MCAST_PORT))
     print("sent stage ", stage)
     sock.close()
 
