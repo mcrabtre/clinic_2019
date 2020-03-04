@@ -5,6 +5,7 @@ import socket
 import struct
 import pickle
 import numpy
+import queue
 
 
 kill = False
@@ -61,11 +62,15 @@ def m_recv(node, stage, q, priority):
         buff = 1470  # max byte value per recv
         sock.bind(server_addr)
         recvd = b''
+        recv_q = queue.PriorityQueue()
         while True:
             part = sock.recv(buff)
-            recvd = recvd + part
+            head = int.from_bytes(part[0:4], 'big')
+            recv_q.put((head, part[4:])) # use of priority queue to sort out of order data-grams
             if len(part) < buff:
                 break
+        for i in range(recv_q.qsize()):
+            recvd = recvd + recv_q.get()[1]
         rec = pickle.loads(recvd)
 
         if not(numpy.array_equal(rec, prev)):
