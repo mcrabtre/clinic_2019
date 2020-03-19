@@ -75,7 +75,7 @@ def m_recv(node, stage, q, priority, point_size=785):
         qsize = recv_q.qsize()
         while not recv_q.empty():
             a = recv_q.get()
-            sys.stdout.write('\rQueuing Data ', int(100*a[0]/qsize), '%')
+            sys.stdout.write('\rQueuing Data ' + str(int(100*a[0]/qsize)) + '%')
             sys.stdout.flush()
             recvd = recvd + a[1]
         data_recvd = np.frombuffer(recvd, dtype='uint8')
