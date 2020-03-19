@@ -118,9 +118,9 @@ def run():
                 exit(-1)
             if cpart >= 4:  # receive condition triggers when all data is ready
                 print('data received')
-                e.recv(pad.unpad(ans_data[0][1], pad_value),
-                       pad.unpad(ans_data[1][1], pad_value),
-                       pad.unpad(ans_data[2][1], pad_value))
+                e.recv(pad.unpad(ans_data[0][1], d),
+                       pad.unpad(ans_data[1][1], d),
+                       pad.unpad(ans_data[2][1], d))
                 cpart = 1
                 time_init = time.time()
                 shuffcount = shuffcount + 1
