@@ -3,16 +3,16 @@
 """
 import socket
 import struct
-import pickle
-import numpy
+import numpy as np
 import queue
+import sys
 
 
 kill = False
 prev = 0
 
 
-def m_recv(node, stage, q, priority):
+def m_recv(node, stage, q, priority, point_size=785):
     global prev
     while not kill:
         if stage == 1:
@@ -63,17 +63,30 @@ def m_recv(node, stage, q, priority):
         sock.bind(server_addr)
         recvd = b''
         recv_q = queue.PriorityQueue()
+        load_symbols = ('.', '. .', '. . .')
         while True:
             part = sock.recv(buff)
             head = int.from_bytes(part[0:4], 'big')
+            sys.stdout.write('\rReceiving '+load_symbols[head % 3])
+            sys.stdout.flush()
             recv_q.put((head, part[4:])) # use of priority queue to sort out of order data-grams
             if len(part) < buff:
                 break
-        for i in range(recv_q.qsize()):
-            recvd = recvd + recv_q.get()[1]
-        rec = pickle.loads(recvd)
+        qsize = recv_q.qsize()
+        while not recv_q.empty():
+            a = recv_q.get()
+            sys.stdout.write('\rQueuing Data ', int(100*a[0]/qsize), '%')
+            sys.stdout.flush()
+            recvd = recvd + a[1]
+        data_recvd = np.frombuffer(recvd, dtype='uint8')
+        loss = len(data_recvd) % point_size
+        if loss:
+            print('missing ', point_size - loss, ' bytes of data, attempting to recover')
+            patch = np.zeros((point_size-loss,), dtype='uint8')
+            data_recvd = np.concatenate((data_recvd, patch))
+        rec = np.reshape(data_recvd, (int(len(data_recvd)/point_size), point_size))
 
-        if not(numpy.array_equal(rec, prev)):
+        if not(np.array_equal(rec, prev)):
             print('received ', len(recvd), ' bytes of data from node ', node, ' stage ', stage, ' priority ', priority)
             q.put((priority, rec))
             prev = rec
