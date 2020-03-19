@@ -8,7 +8,6 @@ Created on Sun Feb  3 09:59:11 2019
 
 import socket
 import time
-import pickle
 
 
 def send(node, stage, data):
@@ -48,7 +47,7 @@ def send(node, stage, data):
     data = data  # data has properties .w .nodenum .tau .k
     #= b'0xff' + y
     #need to tune send buffers
-    datasend = pickle.dumps(data) #will ditch pickle later, its garbage
+    datasend = data.tobytes() #abandoned pickle serialization 3/18/2020
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
     buff = 1466

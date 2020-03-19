@@ -101,7 +101,7 @@ def run():
             while not receive_flag:
                 if not cache_q.qsize() == 0:
                     a = cache_q.get()  # tuple in form a = (priority integer, DATA)
-                    e.recv(pad.unpad(a[1], pad_value))
+                    e.recv(pad.unpad(a[1], d))
                     time_init = time.time()
                     receive_flag = True
                     shuffcount = shuffcount + 1

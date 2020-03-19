@@ -12,8 +12,7 @@ def pad(data, pad_value=1):
     return data_padded
 
 
-def unpad(padded_data, pad_value=1):
-    lim = int(len(padded_data)/pad_value)
-    data = padded_data[0:lim]
+def unpad(padded_data, file_size):
+    data = padded_data[0:file_size]
     return data
 
