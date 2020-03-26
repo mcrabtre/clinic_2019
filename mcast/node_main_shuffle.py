@@ -105,11 +105,11 @@ def run():
                     time_init = time.time()
                     receive_flag = True
                     shuffcount = shuffcount + 1
-                if time.time() >= try_time + 5:  # re-sends after not receiving for 5s
-                    print('Resending could not assert data')
-                    break
+                #if time.time() >= try_time + 5:  # re-sends after not receiving for 5s
+                 #   print('Resending could not assert data')
+                  #  break
 
-            if time.time() >= (time_init + 60):  # times out 60s of not receiving data
+            if time.time() >= (time_init + 180):  # times out 180s of not receiving data
                 print("Error: threads timed out")
                 break
         # send w to agg
