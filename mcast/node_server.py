@@ -26,7 +26,7 @@ def server(host):
                 break                
         print(len(recvd))
         rec = pickle.loads(recvd)
-        print('Recieved w')
+        print('Received Data from Agg')
         conn.close
         
         if len(rec.w) != 0:

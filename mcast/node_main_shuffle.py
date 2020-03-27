@@ -26,7 +26,7 @@ def run():
     n_ip = ip_file.readline()
     nodeIP = n_ip.rstrip(' \n')
     os.remove('output.txt')
-
+    pad_value = 1
     mcast_recv1.kill = False
     n = e.cycle5(int(nodeIP[-1]) + 1)
     e.node = n
@@ -50,23 +50,34 @@ def run():
         # determine node number (n) and total number of nodes (Num) from agg Xmission
         # N is list of node
         # win,tau,k,d,N,aggIP = node_server.server(node_ip)
-        info = node_server.server(nodeIP) 
-        
-        #n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
+        while True:
+            info = node_server.server(nodeIP)
+            if info == 'resend':
+                print('## RESENDING PROTOCOL ##')
+                s1_data = pad.pad(e.stage1_send(), pad_value)
+                s2_data = pad.pad(e.stage2_send(), pad_value)
+                mcast_send.send(n, 1, s1_data)  # send stage1 partition
+                mcast_send.send(n, 2, s2_data)  # send stage2 partition
+            else:
+                break
+        if info == 'restart':
+            print('***Restarting Program***')
+            break
+        # n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
         print('My node number is ', n)
         Num = len(info.node_dict)  # total number of nodes (should be 5)
         d = info.d  # number data points/node
         tau = info.tau  # number of local iterations
         k = info.k  # global iteration number
         K = info.K # total global iterations
-        pad_value = info.pad_value #padding value of data for testing
+        pad_value = info.pad_value # padding value of data for testing
         if k == 0:
             print('beginning session')
             e.set_flag = False
             mcast_recv1.prev = 0
-            if not cache_q.empty(): #
-                for i in range(cache_q.qsize()):
-                    cache_q.get()
+        if not cache_q.empty(): #
+            for i in range(cache_q.qsize()):
+                cache_q.get()
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
         
@@ -113,7 +124,7 @@ def run():
                 #if time.time() >= try_time + 5:  # resend if it doesnt find data after 5 seconds
                   #  print("Resending, couldn't find part ", cpart)
                    # break
-            if time.time() >= (time_init + 180):  # times out 180s of not receiving all 3 pieces of data
+            if time.time() >= (time_init + 60):  # times out 60s of not receiving all 3 pieces of data
                 print("Error: threads timed out")
                 exit(-1)
             if cpart >= 4:  # receive condition triggers when all data is ready
@@ -125,13 +136,17 @@ def run():
                 time_init = time.time()
                 shuffcount = shuffcount + 1
         # send w to agg
+        print('sending cleanup data')
+        s1_data = pad.pad(e.stage1_send(), pad_value)
+        s2_data = pad.pad(e.stage2_send(), pad_value)
+        mcast_send.send(n, 1, s1_data)  # send stage1 partition
+        mcast_send.send(n, 2, s2_data)  # send stage2 partition
         node_client.client(w, fn, host)
         k = k+1
 
     if not mcast_recv1.kill:  # kills threads by ending underlying function(s)
         mcast_recv1.kill = True
         print('Threads killed')
-
 
 while True:
     run()
