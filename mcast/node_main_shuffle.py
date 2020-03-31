@@ -124,7 +124,7 @@ def run():
                 #if time.time() >= try_time + 5:  # resend if it doesnt find data after 5 seconds
                   #  print("Resending, couldn't find part ", cpart)
                    # break
-            if time.time() >= (time_init + 60):  # times out 60s of not receiving all 3 pieces of data
+            if time.time() >= (time_init + 5*60):  # times out 5*60s of not receiving all 3 pieces of data
                 print("Error: threads timed out")
                 exit(-1)
             if cpart >= 4:  # receive condition triggers when all data is ready
