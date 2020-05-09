@@ -27,23 +27,25 @@ def run():
     nodeIP = n_ip.rstrip(' \n')
     os.remove('output.txt')
 
+    # the nodes need to start the receiving threads at the very beginning and keep them running to minimize data loss with
+    # the UDP sockets.
     mcast_recv1.kill = False
-    n = e.cycle5(int(nodeIP[-1]) + 1)
+    n = e.cycle5(int(nodeIP[-1]) + 1)  # extrapolates node number from IP address
     e.node = n
     recv_nodes = e.node_tracker()
     recv_stages = 1
     threads = {}
     cache_q = queue.Queue()  # use of the fifo queue structure ensures safe exchange of data between threads
-    K = 1  # total global counter
-    k = 0 # global iteration
-    for i in range(1):
+    K = 1  # total global
+    k = 0  # global iteration
+    for i in range(1):  # single casting only requires one receiving thread
         # create and start separate threads to receive from different nodes (node, stage, q, priority):
-        threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes, recv_stages, cache_q, i + 1), daemon=False)
+        threads[i] = threading.Thread(target=mcast_recv1.m_recv, args=(recv_nodes, recv_stages, cache_q, i + 1),
+                                      daemon=False)
         threads[i].start()
         print('starting thread ', i + 1)
 
     while True:  # main running loop
-
 
         print('I am ', nodeIP)
         print('Waiting for Agg')
@@ -51,26 +53,27 @@ def run():
         # determine node number (n) and total number of nodes (Num) from agg Xmission
         # N is list of node
         # win,tau,k,d,N,aggIP = node_server.server(node_ip)
-        info = node_server.server(nodeIP) 
-        
-        #n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
+        info = node_server.server(
+            nodeIP)  # data is received from AGG using TCP socket to allow it to work with windows OS.
+
+        # n = info.node_dict[nodeIP] + 1  # node number (1,2,3,4,5)
         print('My node number is ', n)
         Num = len(info.node_dict)  # total number of nodes (should be 5)
         d = info.d  # number data points/node
         tau = info.tau  # number of local iterations
         k = info.k  # global iteration number
-        K = info.K # total global iterations
-        pad_value = info.pad_value #padding value of data for testing
-        if k == 0:
+        K = info.K  # total global iterations
+        pad_value = info.pad_value  # padding value of data for testing
+        if k == 0:  # initialization for a new training cycle
             print('beginning session')
             e.set_flag = False
             mcast_recv1.prev = 0
-            if not cache_q.empty(): #
+            if not cache_q.empty():
                 for i in range(cache_q.qsize()):
                     cache_q.get()
         host = info.host  # aggregator IP
         shuff = info.shuff  # number of shuffles per global iteration
-        
+
         # these can be pulled from the agg if desired 
         weight = 1
         eta = .01
@@ -91,7 +94,7 @@ def run():
         while shuffcount <= shuff:  # main coded shuffling running loop (for shuff iterations)
             for i in range(1):
                 send_data = pad.pad(e.get_work_file(), pad_value)
-                mcast_send.send(n, 1, send_data)  # send data to other node 3 times as redundancy
+                mcast_send.send(n, 1, send_data)  # send data to other node
             data_pts = e.get_work_file()  # data points for current iteration to use for training
             print('training')
             data_pts = data_pts.astype('float64')

@@ -4,11 +4,10 @@
     <content url="file://$MODULE_DIR$/AggCode" />
     <content url="file://$MODULE_DIR$/NodeCode" />
     <content url="file://$MODULE_DIR$/mcast" />
-    <orderEntry type="jdk" jdkName="Python 3.7 (venv) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7.3 (~/anaconda3/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">
-    <option name="projectConfiguration" value="Nosetests" />
     <option name="PROJECT_TEST_RUNNER" value="Nosetests" />
   </component>
 </module>
